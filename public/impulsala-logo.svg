@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logo Impulsala: {i} con ESPACIO entre llaves y la i, profesional -->
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#d946ef"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Llave izquierda { - con espacio antes de la i -->
+  <path d="M 42 18
+           C 28 18 26 28 26 38
+           L 26 52
+           C 26 58 20 60 12 60
+           C 20 60 26 62 26 68
+           L 26 82
+           C 26 92 28 102 42 102"
+        fill="none"
+        stroke="url(#brandGrad)"
+        stroke-width="9"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Punto de la i - centrada con espacio a los lados -->
+  <circle cx="60" cy="32" r="9" fill="url(#brandGrad)"/>
+
+  <!-- Barra vertical de la i - gruesa -->
+  <rect x="52" y="48" width="16" height="44" rx="8" fill="url(#brandGrad)"/>
+
+  <!-- Llave derecha } - con espacio después de la i -->
+  <path d="M 78 18
+           C 92 18 94 28 94 38
+           L 94 52
+           C 94 58 100 60 108 60
+           C 100 60 94 62 94 68
+           L 94 82
+           C 94 92 92 102 78 102"
+        fill="none"
+        stroke="url(#brandGrad)"
+        stroke-width="9"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+</svg>
