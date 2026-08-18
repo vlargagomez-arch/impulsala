@@ -57,6 +57,7 @@ export function CrmProspeccion() {
   const [query, setQuery] = useState("");
   const [location, setLocation] = useState("Bogotá, Colombia");
   const [limit, setLimit] = useState(5);
+  const [focusFlaws, setFocusFlaws] = useState(false);
   const [loading, setLoading] = useState(false);
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +78,7 @@ export function CrmProspeccion() {
       const res = await fetch("/api/prospeccion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: query.trim(), location, limit }),
+        body: JSON.stringify({ query: query.trim(), location, limit, focusFlaws }),
       });
 
       const data = await res.json();
@@ -236,6 +237,26 @@ export function CrmProspeccion() {
             </button>
           ))}
         </div>
+
+        {/* Checkbox: focus on flaws */}
+        <label className="flex items-center gap-3 p-3 rounded-xl bg-violet-500/10 border border-violet-500/20 cursor-pointer hover:bg-violet-500/15 transition-colors">
+          <input
+            type="checkbox"
+            checked={focusFlaws}
+            onChange={(e) => setFocusFlaws(e.target.checked)}
+            disabled={loading}
+            className="w-4 h-4 rounded border-violet-500/40 bg-background text-violet-500 focus:ring-violet-500/50 cursor-pointer"
+          />
+          <div className="flex-1">
+            <span className="text-sm font-medium text-foreground flex items-center gap-1.5">
+              <AlertCircle className="w-3.5 h-3.5 text-violet-400" />
+              Buscar negocios con falencias digitales
+            </span>
+            <span className="text-[11px] text-muted-foreground block mt-0.5">
+              Prioriza negocios sin web, sin email, no aparecen en Google, o con problemas digitales. Son los que más necesitan tus servicios.
+            </span>
+          </div>
+        </label>
       </form>
 
       {/* Error */}
