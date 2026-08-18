@@ -60,6 +60,7 @@ export function CrmProspeccion() {
   const [loading, setLoading] = useState(false);
   const [prospects, setProspects] = useState<Prospect[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<string | null>(null);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
@@ -69,6 +70,7 @@ export function CrmProspeccion() {
 
     setLoading(true);
     setError(null);
+    setErrorType(null);
     setProspects([]);
 
     try {
@@ -81,6 +83,7 @@ export function CrmProspeccion() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.errorType) setErrorType(data.errorType);
         throw new Error(data.error || "Error en la búsqueda");
       }
 
@@ -237,13 +240,26 @@ export function CrmProspeccion() {
 
       {/* Error */}
       {error && (
-        <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-4 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-medium text-amber-300">{error}</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Probá con otra búsqueda o reducí la cantidad de prospectos.
-            </p>
+        <div className={`rounded-xl border p-4 flex items-start gap-3 ${
+          errorType === "ZAI_CONFIG_MISSING"
+            ? "bg-violet-500/10 border-violet-500/30"
+            : "bg-amber-500/10 border-amber-500/30"
+        }`}>
+          <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+            errorType === "ZAI_CONFIG_MISSING" ? "text-violet-400" : "text-amber-400"
+          }`} />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">{error}</p>
+            {errorType === "ZAI_CONFIG_MISSING" ? (
+              <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                <p>Esta función usa IA de Z.ai que solo está disponible en este entorno de desarrollo.</p>
+                <p>Para usar la prospección IA, ejecutá el proyecto localmente con <code className="px-1 py-0.5 bg-muted rounded text-foreground">npm run dev</code> en tu computadora con el SDK configurado, o usá los guiones de Marketing que ya están listos.</p>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground mt-1">
+                Probá con otra búsqueda o reducí la cantidad de prospectos.
+              </p>
+            )}
           </div>
         </div>
       )}

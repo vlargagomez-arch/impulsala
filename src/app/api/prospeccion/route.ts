@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth-guard";
-import ZAI from "z-ai-web-dev-sdk";
 
 /**
  * POST /api/prospeccion
@@ -11,51 +10,44 @@ import ZAI from "z-ai-web-dev-sdk";
  * 2. Extraer info de cada negocio (nombre, web, email si está visible)
  * 3. Generar propuesta personalizada con IA para cada uno
  *
+ * IMPORTANTE: z-ai-web-dev-sdk solo está disponible en el sandbox de Z.ai
+ * (requiere /etc/.z-ai-config con credenciales). En Vercel/producción no funciona.
+ *
  * Response: { prospects: Prospect[] }
  */
-export async function POST(req: NextRequest) {
-  const guard = await requireAdmin(req);
-  if (!guard.ok) return guard.response;
+async function callZaiSdk(query: string, location: string, limit: number) {
+  // Import dinámico para que el build no falle en Vercel si z-ai-web-dev-sdk no está
+  const ZAIModule = await import("z-ai-web-dev-sdk");
+  const ZAI = ZAIModule.default;
 
-  try {
-    const { query, location = "Bogotá, Colombia", limit = 10 } = await req.json();
+  const zai = await ZAI.create();
 
-    if (!query) {
-      return NextResponse.json({ error: "Query requerido" }, { status: 400 });
-    }
+  // 1. Buscar negocios en la web
+  const searchQuery = `${query} ${location} contacto email`;
+  console.log(`🔍 [PROSPECCION] Buscando: ${searchQuery}`);
 
-    const zai = await ZAI.create();
+  const searchResults = await zai.functions.invoke("web_search", {
+    query: searchQuery,
+    num: Math.min(limit * 2, 20),
+  });
 
-    // 1. Buscar negocios en la web
-    const searchQuery = `${query} ${location} contacto email`;
-    console.log(`🔍 [PROSPECCION] Buscando: ${searchQuery}`);
+  if (!Array.isArray(searchResults) || searchResults.length === 0) {
+    return [];
+  }
 
-    const searchResults = await zai.functions.invoke("web_search", {
-      query: searchQuery,
-      num: Math.min(limit * 2, 20), // Pedimos más de los que necesitamos por si algunos no tienen email
-    });
+  // 2. Procesar cada resultado con IA para extraer info y generar propuesta
+  const prospects: any[] = [];
 
-    if (!Array.isArray(searchResults) || searchResults.length === 0) {
-      return NextResponse.json({
-        prospects: [],
-        message: "No se encontraron negocios para esta búsqueda",
-      });
-    }
+  for (let i = 0; i < Math.min(searchResults.length, limit); i++) {
+    const result = searchResults[i];
+    console.log(`📧 [PROSPECCION] Procesando ${i + 1}/${limit}: ${result.name || result.host_name}`);
 
-    // 2. Procesar cada resultado con IA para extraer info y generar propuesta
-    const prospects: any[] = [];
-
-    for (let i = 0; i < Math.min(searchResults.length, limit); i++) {
-      const result = searchResults[i];
-      console.log(`📧 [PROSPECCION] Procesando ${i + 1}/${limit}: ${result.name || result.host_name}`);
-
-      try {
-        // Generar análisis + propuesta con IA
-        const completion = await zai.chat.completions.create({
-          messages: [
-            {
-              role: "assistant",
-              content: `Sos un experto en marketing digital de Impulsala (agencia de desarrollo web, SEO, Ads y automatización con IA en Bogotá, Colombia). Tu tarea es analizar un negocio encontrado en internet y generar una propuesta comercial personalizada.
+    try {
+      const completion = await zai.chat.completions.create({
+        messages: [
+          {
+            role: "assistant",
+            content: `Sos un experto en marketing digital de Impulsala (agencia de desarrollo web, SEO, Ads y automatización con IA en Bogotá, Colombia). Tu tarea es analizar un negocio encontrado en internet y generar una propuesta comercial personalizada.
 
 INSTRUCCIONES:
 1. Extraé el nombre del negocio
@@ -81,10 +73,10 @@ Respondé SOLO en formato JSON válido:
   "subject": "string (max 60 chars)",
   "proposal": "string (3-4 párrafos)"
 }`,
-            },
-            {
-              role: "user",
-              content: `BUSINESS INFO:
+          },
+          {
+            role: "user",
+            content: `BUSINESS INFO:
 Título: ${result.name || "Sin título"}
 URL: ${result.url}
 Dominio: ${result.host_name}
@@ -93,45 +85,74 @@ Ubicación de búsqueda: ${location}
 Tipo de negocio buscado: ${query}
 
 Generá la propuesta en JSON:`,
-            },
-          ],
-          thinking: { type: "disabled" },
-        });
+          },
+        ],
+        thinking: { type: "disabled" },
+      });
 
-        const responseText = completion.choices[0]?.message?.content || "";
+      const responseText = completion.choices[0]?.message?.content || "";
 
-        // Intentar parsear el JSON (la IA a veces lo envuelve en markdown)
-        let prospect;
-        try {
-          // Quitar markdown si existe
-          const cleanJson = responseText
-            .replace(/```json\n?/g, "")
-            .replace(/```\n?/g, "")
-            .trim();
-          prospect = JSON.parse(cleanJson);
-        } catch (parseErr) {
-          console.log(`⚠️ [PROSPECCION] No se pudo parsear JSON para ${result.name}`);
-          // Fallback: crear prospect básico con la info que tenemos
-          prospect = {
-            businessName: result.name || result.host_name,
-            email: null,
-            phone: null,
-            website: result.url,
-            recommendedService: "web",
-            potentialScore: 5,
-            subject: `Propuesta Impulsala para ${result.name || "tu negocio"}`,
-            proposal: `Hola,\n\nTe contacto de Impulsala, agencia digital en Bogotá. Vi tu negocio en internet y me pareció interesante.\n\nNos especializamos en desarrollo web, SEO, campañas publicitarias y automatización con IA para PYMES en Colombia.\n\n¿Te gustaría agendar una videollamada gratuita de 30 minutos para revisar tu caso? Sin compromiso.\n\nSaludos,\nEquipo Impulsala`,
-          };
-        }
-
-        prospects.push({
-          ...prospect,
-          sourceUrl: result.url,
-          sourceDomain: result.host_name,
-        });
-      } catch (err) {
-        console.log(`❌ [PROSPECCION] Error procesando ${result.name}:`, err);
+      let prospect;
+      try {
+        const cleanJson = responseText
+          .replace(/```json\n?/g, "")
+          .replace(/```\n?/g, "")
+          .trim();
+        prospect = JSON.parse(cleanJson);
+      } catch (parseErr) {
+        console.log(`⚠️ [PROSPECCION] No se pudo parsear JSON para ${result.name}`);
+        prospect = {
+          businessName: result.name || result.host_name,
+          email: null,
+          phone: null,
+          website: result.url,
+          recommendedService: "web",
+          potentialScore: 5,
+          subject: `Propuesta Impulsala para ${result.name || "tu negocio"}`,
+          proposal: `Hola,\n\nTe contacto de Impulsala, agencia digital en Bogotá. Vi tu negocio en internet y me pareció interesante.\n\nNos especializamos en desarrollo web, SEO, campañas publicitarias y automatización con IA para PYMES en Colombia.\n\n¿Te gustaría agendar una videollamada gratuita de 30 minutos para revisar tu caso? Sin compromiso.\n\nSaludos,\nEquipo Impulsala`,
+        };
       }
+
+      prospects.push({
+        ...prospect,
+        sourceUrl: result.url,
+        sourceDomain: result.host_name,
+      });
+    } catch (err) {
+      console.log(`❌ [PROSPECCION] Error procesando ${result.name}:`, err);
+    }
+  }
+
+  return prospects;
+}
+
+export async function POST(req: NextRequest) {
+  const guard = await requireAdmin(req);
+  if (!guard.ok) return guard.response;
+
+  try {
+    const { query, location = "Bogotá, Colombia", limit = 10 } = await req.json();
+
+    if (!query) {
+      return NextResponse.json({ error: "Query requerido" }, { status: 400 });
+    }
+
+    let prospects: any[] = [];
+
+    try {
+      prospects = await callZaiSdk(query, location, limit);
+    } catch (sdkErr: any) {
+      // Detectar si el error es por falta de configuración de Z.ai (en Vercel)
+      const errMsg = sdkErr?.message || String(sdkErr);
+      if (errMsg.includes("Configuration file not found") || errMsg.includes(".z-ai-config")) {
+        return NextResponse.json({
+          error: "Prospección IA solo disponible en el entorno de desarrollo Z.ai (sandbox). En Vercel/producción esta función requiere configuración adicional.",
+          errorType: "ZAI_CONFIG_MISSING",
+          prospects: [],
+          total: 0,
+        }, { status: 503 });
+      }
+      throw sdkErr;
     }
 
     console.log(`✅ [PROSPECCION] ${prospects.length} prospectos generados`);
@@ -150,3 +171,4 @@ Generá la propuesta en JSON:`,
     );
   }
 }
+
