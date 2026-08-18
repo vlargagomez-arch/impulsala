@@ -15,15 +15,34 @@ import {
   Zap,
   Clock,
   Hash,
+  Utensils,
+  Home,
+  Dumbbell,
+  ShoppingBag,
+  Scissors,
+  GraduationCap,
+  Stethoscope,
+  Briefcase,
 } from "lucide-react";
 
 type ScriptType = "hook" | "reel" | "testimonio" | "tutorial" | "promocion";
 type ServiceType = "general" | "web" | "seo" | "ads" | "ia";
+type BusinessType =
+  | "general"
+  | "restaurante"
+  | "inmobiliaria"
+  | "gimnasio"
+  | "retail"
+  | "belleza"
+  | "educacion"
+  | "salud"
+  | "profesional";
 
 type Script = {
   id: string;
   type: ScriptType;
   service: ServiceType;
+  business: BusinessType;
   title: string;
   duration: string;
   platform: string;
@@ -34,345 +53,514 @@ type Script = {
 };
 
 const SCRIPTS: Script[] = [
-  // ===== WEB =====
+  // ===== GUIONES POR TIPO DE NEGOCIO: RESTAURANTE =====
   {
-    id: "web-1",
+    id: "restaurante-web-1",
     type: "reel",
     service: "web",
-    title: "Tu web carga en 2 segundos (y Google te premia)",
-    duration: "30s",
+    business: "restaurante",
+    title: "Restaurantes: tu menú digital que vende por WhatsApp",
+    duration: "35s",
     platform: "TikTok / Reels",
-    hook: "¿Sabías que si tu web tarda más de 3 segundos en cargar, pierdes el 50% de tus clientes?",
+    hook: "Si tenés un restaurante y tus clientes todavía llaman por teléfono para pedir, estás perdiendo ventas todos los días. Te muestro cómo arreglarlo.",
     scenes: [
       {
-        time: "0-3s",
-        visual: "Persona mirando el celular con cara de frustración. Pantalla de carga girando.",
-        voiceover: "¿Sabías que si tu web tarda más de 3 segundos en cargar, pierdes la mitad de tus clientes?",
-        textOverlay: "50% se van si tarda +3s",
+        time: "0-4s",
+        visual: "Persona atendiendo teléfono en restaurante caótico. Anota pedido en papel. Se equivoca.",
+        voiceover: "Si tenés un restaurante y tus clientes todavía llaman por teléfono para pedir, estás perdiendo ventas todos los días. Te muestro cómo arreglarlo.",
+        textOverlay: "¿Pedidos por teléfono? Estás perdiendo ventas",
       },
       {
-        time: "3-10s",
-        visual: "Transición rápida a una web de Impulsala cargando instantáneamente. Cronómetro en pantalla.",
-        voiceover: "En Impulsala construimos webs que cargan en menos de 2 segundos. Google nos premia con mejores posiciones.",
-        textOverlay: "Carga en <2 segundos",
-      },
-      {
-        time: "10-20s",
-        visual: "Muestra de 3 webs de clientes (Don XL, Café Herencia, Properati) con transiciones.",
-        voiceover: "Ya llevamos 40+ proyectos entregados. Restaurantes, inmobiliarias, cultura. Todos cargan rapidísimo.",
-        textOverlay: "40+ proyectos",
-      },
-      {
-        time: "20-30s",
-        visual: "Persona sonriendo con su celular mostrando su nueva web. Logo Impulsala al final.",
-        voiceover: "¿Tu web es lenta? Agenda una videollamada gratis y te decimos cómo arreglarla en 30 minutos.",
-        textOverlay: "Diagnóstico gratis → impulsala.com",
-      },
-    ],
-    cta: "Agenda tu videollamada gratuita en impulsala.com o escribinos por WhatsApp al 319 635 4992",
-    hashtags: ["#DesarrolloWeb", "#PaginasWebColombia", "#Bogota", "#PYMES", "#SEO", "#MarketingDigital", "#Impulsala"],
-  },
-  {
-    id: "web-2",
-    type: "tutorial",
-    service: "web",
-    title: "Cómo hacer que tu web venda por ti 24/7",
-    duration: "60s",
-    platform: "YouTube Shorts / Reels",
-    hook: "Tu web debería ser tu mejor vendedor. Pero probablemente está perdiendo clientes ahora mismo.",
-    scenes: [
-      {
-        time: "0-5s",
-        visual: "Persona en pijama atendiendo una llamada a las 11pm. Cara de cansancio.",
-        voiceover: "Tu web debería ser tu mejor vendedor. Pero probablemente está perdiendo clientes ahora mismo.",
-        textOverlay: "¿Perdiendo clientes ahora?",
-      },
-      {
-        time: "5-15s",
-        visual: "Pantalla dividida: web antigua vs web nueva de Impulsala. La nueva tiene WhatsApp integrado.",
-        voiceover: "Una web bien hecha: responde preguntas, califica leads, agenda citas y cierra ventas. Sin que tú muevas un dedo.",
-        textOverlay: "Web que vende = Web que trabaja",
+        time: "4-15s",
+        visual: "Muestra Don XL: cliente armando perro paso a paso en web móvil. Tap, tap, enviar WhatsApp.",
+        voiceover: "Esto es lo que hicimos con Don XL en Villavicencio. El cliente arma su pedido paso a paso en la web: elige tipo, agregos, extras. Se envía solo por WhatsApp. Cero errores, cero llamadas perdidas.",
+        textOverlay: "Pedido → WhatsApp automático",
       },
       {
         time: "15-25s",
-        visual: "Captura del CRM de Impulsala con leads entrando automáticamente.",
-        voiceover: "Cada visitante que llega a tu web se convierte en un lead en tu CRM. Con seguimiento automático por email y WhatsApp.",
-        textOverlay: "Lead → CRM automático",
-      },
-      {
-        time: "25-40s",
-        visual: "Móvil mostrando una web responsive perfecta. Tap en botón WhatsApp, se abre el chat.",
-        voiceover: "Diseño responsive impecable en celular, tablet y desktop. Integración directa con WhatsApp. Tus clientes te contactan con un toque.",
-        textOverlay: "WhatsApp en 1 toque",
-      },
-      {
-        time: "40-50s",
-        visual: "Gráfico animado: +180% conversión, +340% ROI.",
-        voiceover: "Nuestros clientes aumentan un 180% sus conversiones. Es como tener 3 vendedores extra sin pagar sueldo.",
-        textOverlay: "+180% conversión",
-      },
-      {
-        time: "50-60s",
-        visual: "Logo Impulsala + botón agendar + teléfono.",
-        voiceover: "Agenda tu videollamada gratuita de 30 minutos. Te revisamos tu web actual y te damos un plan personalizado. Sin compromiso.",
-        textOverlay: "Diagnóstico gratis → impulsala.com",
-      },
-    ],
-    cta: "Videollamada gratuita de 30 min: impulsala.com · WhatsApp: 319 635 4992",
-    hashtags: ["#DesarrolloWeb", "#PaginasWeb", "#PYMESColombia", "#Bogota", "#MarketingDigital", "#VenderOnline", "#Impulsala"],
-  },
-
-  // ===== SEO =====
-  {
-    id: "seo-1",
-    type: "hook",
-    service: "seo",
-    title: "Por qué tu competencia aparece primero en Google",
-    duration: "20s",
-    platform: "TikTok / Reels",
-    hook: "Tu competencia aparece primero en Google y tú no. Te explico por qué en 20 segundos.",
-    scenes: [
-      {
-        time: "0-3s",
-        visual: "Búsqueda en Google: 'abogado divorcios Bogotá'. La competencia aparece arriba, tu web no aparece ni en página 5.",
-        voiceover: "Tu competencia aparece primero en Google y tú no. Te explico por qué en 20 segundos.",
-        textOverlay: "¿Por qué ellos y no tú?",
-      },
-      {
-        time: "3-12s",
-        visual: "Animación: 3 pilares del SEO — Velocidad, Contenido, Autoridad.",
-        voiceover: "No es suerte. Es SEO. Tres cosas: velocidad de tu web, contenido optimizado con las keywords correctas, y autoridad con backlinks reales.",
-        textOverlay: "Velocidad · Contenido · Autoridad",
-      },
-      {
-        time: "12-20s",
-        visual: "Logo Impulsala + tel.",
-        voiceover: "En Impulsala te posicionamos en los primeros resultados. Agenda una auditoría SEO gratis y te mostramos qué estás haciendo mal.",
-        textOverlay: "Auditoría gratis → impulsala.com",
-      },
-    ],
-    cta: "Auditoría SEO gratuita: impulsala.com · WhatsApp: 319 635 4992",
-    hashtags: ["#SEO", "#PosicionamientoGoogle", "#MarketingDigital", "#Bogota", "#PYMES", "#Impulsala", "#GoogleAds"],
-  },
-  {
-    id: "seo-2",
-    type: "tutorial",
-    service: "seo",
-    title: "3 errores de SEO que están matando tu web",
-    duration: "45s",
-    platform: "Reels / YouTube Shorts",
-    hook: "3 errores de SEO que están matando tu web ahora mismo. Si haces el #2, perdés el 70% de tu tráfico.",
-    scenes: [
-      {
-        time: "0-5s",
-        visual: "Persona grave mirando cámara. Texto grande: 3 ERRORES SEO.",
-        voiceover: "3 errores de SEO que están matando tu web ahora mismo. Si haces el #2, perdés el 70% de tu tráfico.",
-        textOverlay: "3 errores SEO mortales",
-      },
-      {
-        time: "5-15s",
-        visual: "Pantallazo web lenta. Cronómetro. Imagen Google penalizando.",
-        voiceover: "Error 1: web lenta. Google penaliza cualquier página que tarde más de 3 segundos en cargar. Tu cliente se va antes de ver tu contenido.",
-        textOverlay: "#1 Web lenta = penalización",
-      },
-      {
-        time: "15-25s",
-        visual: "Página con texto genérico, sin keywords. Tacha con X roja.",
-        voiceover: "Error 2: contenido sin keywords. Si no mencionás lo que tu cliente busca, Google no sabe para quién es tu web. Ahí perdiste el 70% del tráfico.",
-        textOverlay: "#2 Sin keywords = -70% tráfico",
+        visual: "Estadísticas animadas: +380% pedidos WhatsApp, +28% ticket promedio, -60% tiempo de pedido.",
+        voiceover: "Resultados: 380% más pedidos por WhatsApp. Ticket promedio subió 28% porque la gente agrega más cuando lo ve visual. Tiempo de pedido bajó 60%.",
+        textOverlay: "+380% pedidos · +28% ticket",
       },
       {
         time: "25-35s",
-        visual: "Web sin mobile. Persona intentando navegar en celular. Frustración.",
-        voiceover: "Error 3: no estar optimizado para móvil. El 70% de las búsquedas son desde celular. Si tu web no se ve bien ahí, perdiste.",
-        textOverlay: "#3 No mobile = -70% visitas",
-      },
-      {
-        time: "35-45s",
-        visual: "Logo Impulsala + auditoría.",
-        voiceover: "¿Cometés alguno de estos? En Impulsala te hacemos una auditoría SEO gratis. 30 minutos por videollamada. Te decimos exactamente qué arreglar.",
-        textOverlay: "Auditoría gratis → impulsala.com",
-      },
-    ],
-    cta: "Auditoría SEO gratis: impulsala.com · WhatsApp: 319 635 4992",
-    hashtags: ["#SEO", "#ErroresSEO", "#MarketingDigital", "#GoogleRanking", "#PYMES", "#Bogota", "#Impulsala"],
-  },
-
-  // ===== ADS =====
-  {
-    id: "ads-1",
-    type: "testimonio",
-    service: "ads",
-    title: "Café Herencia: cómo duplicamos sus ventas con Google Ads",
-    duration: "50s",
-    platform: "Reels / YouTube Shorts",
-    hook: "Café Herencia duplicó sus ventas en 3 meses con Google Ads. Te cuento cómo lo hicimos.",
-    scenes: [
-      {
-        time: "0-5s",
-        visual: "Café Herencia lleno de gente. Dueño sonriendo. Estadística: +100% ventas.",
-        voiceover: "Café Herencia duplicó sus ventas en 3 meses con Google Ads. Te cuento cómo lo hicimos.",
-        textOverlay: "+100% ventas en 3 meses",
-      },
-      {
-        time: "5-15s",
-        visual: "Antes: café vacío. Después: café lleno. Transición.",
-        voiceover: "Antes: el café estaba vacío entre semana. Hoy: lleno de lunes a viernes. ¿La diferencia? Aparecemos cuando alguien busca 'café cultural Bogotá'.",
-        textOverlay: "Antes: vacío → Ahora: lleno",
-      },
-      {
-        time: "15-25s",
-        visual: "Pantallazo de Google Ads. CPC bajo. Conversiones altas.",
-        voiceover: "Reducimos el costo por cliente en un 60%. Cada peso invertido genera 3.2 pesos en ventas. Eso es ROI del 320%.",
-        textOverlay: "ROI: 320%",
-      },
-      {
-        time: "25-35s",
-        visual: "Mapa de Bogotá con marcadores donde aparecen los anuncios.",
-        voiceover: "Segmentamos por ubicación: solo mostramos anuncios a personas en La Candelaria y zonas cercanas. Cero gastos desperdiciados.",
-        textOverlay: "Segmentación precisa",
-      },
-      {
-        time: "35-50s",
-        visual: "Dueño hablando + logo Impulsala.",
-        voiceover: "Cada semana recibimos un reporte claro. Sin métricas vanidosas. Solo ventas reales. Si querés duplicar tus ventas con Google Ads, agenda una videollamada gratis con Impulsala.",
+        visual: "Dueño restaurante sonriendo con celular. Logo Impulsala + CTA.",
+        voiceover: "Si tenés restaurante, cafetería o comida rápida, esto lo podés tener funcionando en 2 semanas. Videollamada gratis y te muestro tu caso.",
         textOverlay: "Videollamada gratis → impulsala.com",
       },
     ],
-    cta: "Duplicá tus ventas con Ads: impulsala.com · WhatsApp: 319 635 4992",
-    hashtags: ["#GoogleAds", "#MarketingDigital", "#PYMES", "#Bogota", "#CafeHerencia", "#CasoDeExito", "#Impulsala"],
+    cta: "Menú digital + WhatsApp: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#Restaurantes", "#MenuDigital", "#PedidosWhatsApp", "#Bogota", "#Colombia", "#Impulsala", "#RestaurantesColombia"],
   },
   {
-    id: "ads-2",
-    type: "hook",
-    service: "ads",
-    title: "Estás tirando tu plata en anuncios",
-    duration: "25s",
-    platform: "TikTok / Reels",
-    hook: "Si estás haciendo anuncios en Meta o Google sin un experto, estás tirando tu plata a la basura.",
-    scenes: [
-      {
-        time: "0-3s",
-        visual: "Persona tirando billetes a la basura. Cara seria.",
-        voiceover: "Si estás haciendo anuncios en Meta o Google sin un experto, estás tirando tu plata a la basura.",
-        textOverlay: "¿Tirando plata?",
-      },
-      {
-        time: "3-12s",
-        visual: "Pantallazo de Facebook Ads Manager. CPC alto. Conversiones bajas.",
-        voiceover: "Anuncios mal optimizados: pagás $5 por clic cuando podrías pagar $1. Anuncios sin segmentar: los ve gente que nunca va a comprar.",
-        textOverlay: "$5 por clic → $1 por clic",
-      },
-      {
-        time: "12-20s",
-        visual: "Captura de campañas Impulsala optimizadas. ROI 340%.",
-        voiceover: "En Impulsala reducimos tu costo por lead hasta 60%. Multiplicamos tus resultados con el mismo presupuesto.",
-        textOverlay: "ROI: 340%",
-      },
-      {
-        time: "20-25s",
-        visual: "Logo Impulsala + CTA.",
-        voiceover: "Agenda tu cita gratis y te mostramos cuánta plata estás perdiendo.",
-        textOverlay: "Cita gratis → impulsala.com",
-      },
-    ],
-    cta: "Stop perder plata con Ads: impulsala.com · WhatsApp: 319 635 4992",
-    hashtags: ["#GoogleAds", "#MetaAds", "#MarketingDigital", "#PYMES", "#Bogota", "#Impulsala", "#ROI"],
-  },
-
-  // ===== IA =====
-  {
-    id: "ia-1",
-    type: "reel",
-    service: "ia",
-    title: "Tu negocio nunca duerme con agentes de IA",
-    duration: "35s",
-    platform: "TikTok / Reels",
-    hook: "Imaginá tener un vendedor que atiende a tus clientes a las 3am, a las 11pm, los domingos. Sin pagarle sueldo.",
-    scenes: [
-      {
-        time: "0-3s",
-        visual: "Reloj marcando 3am. Pantalla de WhatsApp con mensaje entrando de un cliente.",
-        voiceover: "Imaginá tener un vendedor que atiende a tus clientes a las 3am, a las 11pm, los domingos. Sin pagarle sueldo.",
-        textOverlay: "Vendedor 24/7 gratis",
-      },
-      {
-        time: "3-12s",
-        visual: "Chat de WhatsApp: cliente pregunta precio, agente IA responde instantáneo. Cliente agenda cita.",
-        voiceover: "Eso es un agente de IA. Conversa con tus clientes como un humano, responde preguntas, califica leads, agenda citas. 24/7 sin cansarse.",
-        textOverlay: "Conversa · Califica · Agenda",
-      },
-      {
-        time: "12-22s",
-        visual: "Dashboard mostrando 23 conversaciones atendidas. Avatares de clientes.",
-        voiceover: "Nuestros agentes atienden un promedio de 120 conversaciones al día. Imaginate: 120 clientes atendidos sin que muevas un dedo.",
-        textOverlay: "120 conversaciones/día",
-      },
-      {
-        time: "22-30s",
-        visual: "Persona libre, tomando café, leyendo. Su celular suena: 'Cita agendada'.",
-        voiceover: "Mientras vos dormís o pasás tiempo con tu familia, tu agente de IA cierra citas y califica leads. Vos solo recibís los clientes listos para comprar.",
-        textOverlay: "Vos descansás, él trabaja",
-      },
-      {
-        time: "30-35s",
-        visual: "Logo Impulsala + botón agendar.",
-        voiceover: "Agenda una demo de 5 minutos y te mostramos tu futuro agente de IA en acción.",
-        textOverlay: "Demo gratis → impulsala.com",
-      },
-    ],
-    cta: "Demo IA gratis 5 min: impulsala.com · WhatsApp: 319 635 4992",
-    hashtags: ["#InteligenciaArtificial", "#Chatbot", "#Automatizacion", "#PYMES", "#Bogota", "#Impulsala", "#GPT4"],
-  },
-  {
-    id: "ia-2",
+    id: "restaurante-ia-1",
     type: "tutorial",
     service: "ia",
-    title: "Cómo automatizar tu negocio con IA en 2026",
-    duration: "55s",
-    platform: "YouTube Shorts / Reels",
-    hook: "Si tu negocio todavía no tiene IA en 2026, estás 5 años atrás de tu competencia. Te muestro 3 automatizaciones fáciles.",
+    business: "restaurante",
+    title: "Reservas automáticas 24/7 para restaurantes con IA",
+    duration: "45s",
+    platform: "Reels / YouTube Shorts",
+    hook: "Mientras tu restaurante está cerrado a las 11pm, tus clientes quieren reservar. Si no respondés, se van a otro lado. Te muestro la solución.",
     scenes: [
       {
         time: "0-5s",
-        visual: "Persona mirando cámara con urgencia. Texto: 3 AUTOMATIZACIONES IA.",
-        voiceover: "Si tu negocio todavía no tiene IA en 2026, estás 5 años atrás de tu competencia. Te muestro 3 automatizaciones fáciles.",
-        textOverlay: "3 automatizaciones IA",
+        visual: "Reloj 11pm. Mensaje WhatsApp entrante: 'Hola, quiero reservar mesa para 4 el sábado'. Nadie responde. Cliente va a otro restaurante.",
+        voiceover: "Mientras tu restaurante está cerrado a las 11pm, tus clientes quieren reservar. Si no respondés, se van a otro lado. Te muestro la solución.",
+        textOverlay: "Cliente perdido a las 11pm",
       },
       {
-        time: "5-18s",
-        visual: "Captura: chatbot en web atendiendo cliente. Mensaje automático.",
-        voiceover: "Automatización 1: chatbot en tu web. Responde preguntas frecuentes, califica leads y agenda citas. Tus clientes obtienen respuesta inmediata, 24/7. Implementación: 2 semanas.",
-        textOverlay: "#1 Chatbot 24/7",
+        time: "5-15s",
+        visual: "Mismo mensaje entrando. Agente IA responde instantáneo: 'Hola! Tenemos mesas disponibles el sábado a las 8pm y 9:30pm. ¿Cuál preferís?'.",
+        voiceover: "Agente de IA que responde a tus clientes 24/7. Reserva mesas, contesta preguntas del menú, toma pedidos. Incluso a las 3am del domingo.",
+        textOverlay: "Reservas 24/7 con IA",
       },
       {
-        time: "18-30s",
-        visual: "Captura: lead entra por web, se guarda en CRM, se envía email automático, se notifica a vendedor.",
-        voiceover: "Automatización 2: flujo de leads. Cuando alguien contacta por tu web, automáticamente se guarda en tu CRM, se le envía email de bienvenida, se notifica a tu equipo de ventas y se agenda seguimiento.",
-        textOverlay: "#2 Flujo de leads automático",
+        time: "15-25s",
+        visual: "Dashboard mostrando 47 reservas tomadas automáticamente esta semana. Calendario lleno.",
+        voiceover: "Nuestros restaurantes atienden un promedio de 47 reservas por semana automáticamente. Vos dormís, la IA trabaja. Vos llegás al restaurante y ya tenés la agenda llena.",
+        textOverlay: "47 reservas automáticas/semana",
       },
       {
-        time: "30-42s",
-        visual: "Posts de Instagram publicados automáticamente en diferentes horas.",
-        voiceover: "Automatización 3: publicación en redes. Programás contenido para todo el mes. Se publica solo en Instagram, Facebook y TikTok en los mejores horarios. Sin que tengas que acordarte.",
-        textOverlay: "#3 Redes automáticas",
+        time: "25-35s",
+        visual: "Captura: agente IA confirmando reserva, pidiendo nombre, teléfono, número de personas.",
+        voiceover: "El agente confirma la reserva, pide nombre, teléfono y número de personas. Todo se guarda en tu sistema. Si el cliente no aparece, le mandás recordatorio automático.",
+        textOverlay: "Confirmación + recordatorio",
       },
       {
-        time: "42-55s",
-        visual: "Gráfico: 120 horas ahorradas/mes. Logo Impulsala.",
-        voiceover: "Promedio: 120 horas ahorradas al mes por cliente. Es como tener 3 empleados extra sin pagarles sueldo. Agenda una demo y vemos qué podés automatizar en tu negocio.",
-        textOverlay: "120h ahorradas/mes · Demo: impulsala.com",
+        time: "35-45s",
+        visual: "Logo Impulsala + CTA.",
+        voiceover: "Demo gratis de 5 minutos. Te mostramos tu agente de IA funcionando. Agenda en impulsala.com o WhatsApp al 319 635 4992.",
+        textOverlay: "Demo gratis → impulsala.com",
       },
     ],
-    cta: "Demo IA gratis: impulsala.com · WhatsApp: 319 635 4992",
-    hashtags: ["#AutomatizacionIA", "#Chatbot", "#InteligenciaArtificial", "#PYMES", "#Bogota", "#Impulsala", "#Productividad"],
+    cta: "Agente IA para restaurantes: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#Restaurantes", "#ReservasAutomaticas", "#IA", "#Chatbot", "#Bogota", "#Impulsala", "#RestaurantesColombia"],
   },
 
-  // ===== GENERAL / BRAND =====
+  // ===== GUIONES POR TIPO DE NEGOCIO: INMOBILIARIA =====
+  {
+    id: "inmobiliaria-web-1",
+    type: "reel",
+    service: "web",
+    business: "inmobiliaria",
+    title: "Inmobiliarias: portal con +50.000 propiedades que carga en 200ms",
+    duration: "40s",
+    platform: "TikTok / Reels",
+    hook: "Si tenés inmobiliaria y tu web no carga rápido, perdés clientes. Properati tiene 50.000 propiedades y carga en 200ms. Te muestro cómo lo hicimos.",
+    scenes: [
+      {
+        time: "0-5s",
+        visual: "Persona intentando buscar apartamento en web lenta. Se frustra, cierra. Cronómetro: 8 segundos.",
+        voiceover: "Si tenés inmobiliaria y tu web no carga rápido, perdés clientes. Properati tiene 50.000 propiedades y carga en 200ms. Te muestro cómo lo hicimos.",
+        textOverlay: "Web lenta = clientes perdidos",
+      },
+      {
+        time: "5-15s",
+        visual: "Captura: Properati cargando instantáneo. Mapa interactivo con miles de propiedades. Filtros: tipo, precio, ubicación, habitaciones.",
+        voiceover: "Properati: portal inmobiliario con 50.000 propiedades. Mapa interactivo con clusterización inteligente. Filtros combinables: tipo, precio, ubicación, habitaciones, baños. Todo en 200 milisegundos.",
+        textOverlay: "50.000 propiedades · 200ms carga",
+      },
+      {
+        time: "15-25s",
+        visual: "Captura del mapa: click en cluster, hace zoom, muestra propiedades individuales. Soporta 10.000 marcadores simultáneos.",
+        voiceover: "Mapa con agrupación inteligente: si hay 100 propiedades juntas, las agrupa en un cluster. Hacés clic y hace zoom mostrando cada una. Soporta 10.000 marcadores sin trabarse.",
+        textOverlay: "Clusterización inteligente",
+      },
+      {
+        time: "25-35s",
+        visual: "Captura: lead entra por web, se guarda en CRM automáticamente. Lead scoring automático.",
+        voiceover: "Cada contacto se guarda en tu CRM automáticamente. El sistema califica el lead según propiedades vistas y tiempo en la web. Vos solo atendés los calientes.",
+        textOverlay: "Lead scoring automático",
+      },
+      {
+        time: "35-40s",
+        visual: "Logo Impulsala + CTA.",
+        voiceover: "¿Tenés inmobiliaria? Agenda videollamada gratis y te mostramos cómo potenciar tu portal.",
+        textOverlay: "Videollamada gratis → impulsala.com",
+      },
+    ],
+    cta: "Portal inmobiliario + CRM: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#Inmobiliaria", "#BienesRaices", "#PortalInmobiliario", "#Bogota", "#Colombia", "#Impulsala", "#Propiedades"],
+  },
+  {
+    id: "inmobiliaria-ads-1",
+    type: "testimonio",
+    service: "ads",
+    business: "inmobiliaria",
+    title: "Raval Bienes Raíces: +420% leads calificados con Google Ads",
+    duration: "50s",
+    platform: "Reels / YouTube Shorts",
+    hook: "Raval Bienes Raíces tenía 200 propiedades y pocas visitas. En 3 meses llegamos a 420% más leads calificados. Te cuento cómo.",
+    scenes: [
+      {
+        time: "0-5s",
+        visual: "Inmobiliaria con agentes aburridos, sin clientes. Estadística: pocas visitas.",
+        voiceover: "Raval Bienes Raíces tenía 200 propiedades y pocas visitas. En 3 meses llegamos a 420% más leads calificados. Te cuento cómo.",
+        textOverlay: "+420% leads calificados",
+      },
+      {
+        time: "5-15s",
+        visual: "Antes: anuncios genéricos sin segmentar. Después: anuncios hiper segmentados por ubicación, presupuesto, tipo propiedad.",
+        voiceover: "Antes: anuncios genéricos que veía cualquiera. Después: segmentación precisa. Anuncio de apartamento en Chapinero lo ve solo quien busca en Chapinero con ese presupuesto. Cero plata desperdiciada.",
+        textOverlay: "Segmentación precisa",
+      },
+      {
+        time: "15-25s",
+        visual: "Pantallazo Google Ads: CPC bajo, conversiones altas. ROI 3.2x.",
+        voiceover: "Costo por lead bajó 60%. ROI de 3.2 pesos por cada peso invertido. Es decir: si invertís 1 millón, recuperás 3.2 millones en comisiones.",
+        textOverlay: "ROI: 3.2x",
+      },
+      {
+        time: "25-35s",
+        visual: "Captura: landing pages específicas por tipo de propiedad (apartamento Bogotá, casa Medellín, finca suburbana).",
+        voiceover: "Creamos landing pages específicas: si alguien busca 'apartamento arriendo Bogotá', aterriza en una página que muestra solo eso. No una home genérica. Conversión sube 4x.",
+        textOverlay: "Landing pages específicas",
+      },
+      {
+        time: "35-50s",
+        visual: "Agente inmobiliario feliz, llamando a leads. Logo Impulsala + CTA.",
+        voiceover: "Raval pasó de 350 a 1.800 operaciones en 2 años. Si tenés inmobiliaria y querés más leads calificados, agenda videollamada gratis con Impulsala.",
+        textOverlay: "Videollamada gratis → impulsala.com",
+      },
+    ],
+    cta: "Más leads inmobiliarios: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#Inmobiliaria", "#GoogleAds", "#LeadsInmobiliarios", "#Bogota", "#Impulsala", "#CasoDeExito", "#MarketingInmobiliario"],
+  },
+
+  // ===== GUIONES POR TIPO DE NEGOCIO: GIMNASIO =====
+  {
+    id: "gimnasio-web-1",
+    type: "reel",
+    service: "web",
+    business: "gimnasio",
+    title: "Gimnasios: web con plan de entrenamiento personalizado",
+    duration: "35s",
+    platform: "TikTok / Reels",
+    hook: "Tu gimnasio pierde socios porque no les das seguimiento. Con una web bien hecha, cada socio recibe su plan automáticamente. Te muestro cómo.",
+    scenes: [
+      {
+        time: "0-5s",
+        visual: "Socio nuevo entrando al gimnasio, confundido. Nadie lo atiende. Se va.",
+        voiceover: "Tu gimnasio pierde socios porque no les das seguimiento. Con una web bien hecha, cada socio recibe su plan automáticamente. Te muestro cómo.",
+        textOverlay: "¿Socios que se van? Tu gimnasio pierde plata",
+      },
+      {
+        time: "5-15s",
+        visual: "Web móvil: socio nuevo completa formulario (objetivo, peso, días disponibles). Recibe plan automáticamente por email + WhatsApp.",
+        voiceover: "Socio nuevo entra a tu web, completa su objetivo (bajar peso, ganar masa), peso y días disponibles. Recibe plan personalizado en su email y WhatsApp en 30 segundos. Sin que muevas un dedo.",
+        textOverlay: "Plan automático en 30s",
+      },
+      {
+        time: "15-25s",
+        visual: "Captura: socio recibe recordatorio diario por WhatsApp: 'Hoy toca piernas, ¿vienes?'",
+        voiceover: "Cada día recibe recordatorio por WhatsApp: 'Hoy toca piernas, ¿vienes?'. Si no responde, le seguimos al día siguiente. Resultado: 70% más retención de socios.",
+        textOverlay: "+70% retención socios",
+      },
+      {
+        time: "25-35s",
+        visual: "Gimnasio lleno. Dueño contando plata. Logo Impulsala + CTA.",
+        voiceover: "Más socios que se quedan = más plata. Más referidos = más socios nuevos. Si tenés gimnasio, crossfit box o studio de yoga, esto lo podés tener en 2 semanas. Videollamada gratis.",
+        textOverlay: "Videollamada gratis → impulsala.com",
+      },
+    ],
+    cta: "Web para gimnasios: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#Gimnasio", "#Fitness", "#Crossfit", "#Bogota", "#Yoga", "#Impulsala", "#GimnasiosColombia"],
+  },
+  {
+    id: "gimnasio-ia-1",
+    type: "tutorial",
+    service: "ia",
+    business: "gimnasio",
+    title: "Chatbot que resuelve dudas de tu gimnasio 24/7",
+    duration: "40s",
+    platform: "YouTube Shorts / Reels",
+    hook: "Las preguntas que más te cansan en tu gimnasio: '¿cuánto cuesta?', '¿qué horarios?', '¿tienen parqueadero?'. Un chatbot las responde por vos. 24/7.",
+    scenes: [
+      {
+        time: "0-5s",
+        visual: "Persona en recepción respondiendo la misma pregunta por décima vez. Cara de cansancio.",
+        voiceover: "Las preguntas que más te cansan en tu gimnasio: '¿cuánto cuesta?', '¿qué horarios?', '¿tienen parqueadero?'. Un chatbot las responde por vos. 24/7.",
+        textOverlay: "Cansado de las mismas preguntas?",
+      },
+      {
+        time: "5-15s",
+        visual: "Captura: chatbot en web del gimnasio. Cliente pregunta, chatbot responde con info exacta (precios, horarios, ubicación, planes).",
+        voiceover: "Chatbot inteligente en tu web y WhatsApp. Responde precios, horarios, ubicación, planes disponibles, clases del día. Conoce tu gimnasio mejor que vos.",
+        textOverlay: "Responde: precios, horarios, planes",
+      },
+      {
+        time: "15-25s",
+        visual: "Captura: chatbot agendando clase de prueba automáticamente. Confirmación al cliente.",
+        voiceover: "Si el cliente está interesado, le ofrece clase de prueba gratis. Agenda automáticamente. Le manda recordatorio el día anterior. Vos solo recibís al cliente nuevo en la puerta.",
+        textOverlay: "Clase prueba automática",
+      },
+      {
+        time: "25-35s",
+        visual: "Dashboard: 38 clases de prueba agendadas este mes. 22 se convirtieron en socios.",
+        voiceover: "Un gimnasio nuestro atiende 38 consultas al día automáticamente. 22 se convierten en socios pagos. Eso es $9 millones extra al mes en membresías.",
+        textOverlay: "+$9M COP/mes extra",
+      },
+      {
+        time: "35-40s",
+        visual: "Logo Impulsala + CTA.",
+        voiceover: "Si tenés gym, box o studio, esto lo podés tener en 2 semanas. Demo gratis en impulsala.com.",
+        textOverlay: "Demo gratis → impulsala.com",
+      },
+    ],
+    cta: "Chatbot para gimnasios: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#Gimnasio", "#Chatbot", "#IA", "#Fitness", "#Bogota", "#Impulsala", "#MarketingFitness"],
+  },
+
+  // ===== GUIONES POR TIPO DE NEGOCIO: RETAIL / TIENDA =====
+  {
+    id: "retail-web-1",
+    type: "reel",
+    service: "web",
+    business: "retail",
+    title: "Tiendas online que venden solas con e-commerce",
+    duration: "30s",
+    platform: "TikTok / Reels",
+    hook: "Si vendés productos y no tenés tienda online, estás perdiendo 70% de tus ventas potenciales. Te muestro cómo se hace.",
+    scenes: [
+      {
+        time: "0-3s",
+        visual: "Persona en tienda física vendiendo. Cliente: '¿tienen tienda online?'. Vendedor: 'No'. Cliente se va.",
+        voiceover: "Si vendés productos y no tenés tienda online, estás perdiendo 70% de tus ventas potenciales. Te muestro cómo se hace.",
+        textOverlay: "¿Sin tienda online? -70% ventas",
+      },
+      {
+        time: "3-12s",
+        visual: "Captura: tienda online Impulsala. Catálogo de productos, carrito, checkout con Wompi/PayU.",
+        voiceover: "Tienda online con catálogo, carrito de compras, checkout integrado con Wompi, PayU, Mercado Pago. Tus clientes compran a cualquier hora. Mientras vos dormís, vendés.",
+        textOverlay: "E-commerce que vende 24/7",
+      },
+      {
+        time: "12-22s",
+        visual: "Captura: gestión de inventario automática. Stock baja solo cuando se vende.",
+        voiceover: "Gestión de inventario automática: cuando alguien compra, el stock baja solo. Si te quedás sin stock, el producto se oculta. Nunca vendés algo que no tenés.",
+        textOverlay: "Inventario automático",
+      },
+      {
+        time: "22-30s",
+        visual: "Logo Impulsala + CTA.",
+        voiceover: "Tienda online lista en 2-4 semanas. Integrada con pasarelas colombianas. Videollamada gratis.",
+        textOverlay: "Videollamada gratis → impulsala.com",
+      },
+    ],
+    cta: "Tienda online: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#TiendaOnline", "#Ecommerce", "#Colombia", "#Bogota", "#VenderOnline", "#Impulsala", "#Wompi"],
+  },
+  {
+    id: "retail-ads-1",
+    type: "hook",
+    service: "ads",
+    business: "retail",
+    title: "Vendé más con catálogos en Meta Ads",
+    duration: "25s",
+    platform: "TikTok / Reels",
+    hook: "¿Sabías que podés mostrar TODO tu catálogo en un solo anuncio de Facebook? Y Facebook elige automáticamente qué producto mostrar a cada persona.",
+    scenes: [
+      {
+        time: "0-5s",
+        visual: "Mosaico animado de 100 productos. Pasa a un anuncio único que se adapta a cada usuario.",
+        voiceover: "¿Sabías que podés mostrar TODO tu catálogo en un solo anuncio de Facebook? Y Facebook elige automáticamente qué producto mostrar a cada persona.",
+        textOverlay: "1 anuncio → 100 productos",
+      },
+      {
+        time: "5-15s",
+        visual: "Usuario A ve zapatos. Usuario B ve camisetas. Usuario C ve pantalones. Mismo anuncio, distintos productos.",
+        voiceover: "A Juan le muestra zapatos porque vio zapatos ayer. A María le muestra camisetas porque le gustan. A Pedro pantalones. Mismo anuncio, productos distintos. Por persona.",
+        textOverlay: "Anuncios personalizados por persona",
+      },
+      {
+        time: "15-25s",
+        visual: "Estadísticas: +180% conversión, -60% costo por venta. Logo Impulsala.",
+        voiceover: "Resultado: 180% más conversión, 60% menos costo por venta. Si tenés tienda con productos, esto es obligatorio. Agenda videollamada gratis.",
+        textOverlay: "+180% conversión → impulsala.com",
+      },
+    ],
+    cta: "Catálogos en Meta Ads: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#MetaAds", "#FacebookAds", "#Ecommerce", "#Retail", "#Bogota", "#Impulsala", "#TiendaOnline"],
+  },
+
+  // ===== GUIONES POR TIPO DE NEGOCIO: BELLEZA / SPA =====
+  {
+    id: "belleza-web-1",
+    type: "reel",
+    service: "web",
+    business: "belleza",
+    title: "Spa y peluquerías: reservas online que llenan tu agenda",
+    duration: "30s",
+    platform: "TikTok / Reels",
+    hook: "Tu peluquería o spa pierde clientes porque contestás tarde el WhatsApp. Con reservas online automáticas, llenás tu agenda sin mover un dedo.",
+    scenes: [
+      {
+        time: "0-3s",
+        visual: "Mujer cortándose el pelo ella misma.Texto: 'No pudo reservar'.",
+        voiceover: "Tu peluquería o spa pierde clientes porque contestás tarde el WhatsApp. Con reservas online automáticas, llenás tu agenda sin mover un dedo.",
+        textOverlay: "Cliente perdida = -1 reserva",
+      },
+      {
+        time: "3-12s",
+        visual: "Captura: web con calendario de horarios disponibles. Cliente elige servicio + hora + profesional. Reserva confirmada.",
+        voiceover: "Calendario online en tu web. La cliente elige servicio, horario y profesional. Reserva confirmada al instante. Se le manda recordatorio por WhatsApp 2 horas antes.",
+        textOverlay: "Reservas 24/7 automáticas",
+      },
+      {
+        time: "12-22s",
+        visual: "Captura: dashboard de reservas con agenda llena. Reducción de no-shows.",
+        voiceover: "Reducción del 80% en no-shows. Cuando la cliente recibe recordatorio por WhatsApp, casi nunca falta. Tu agenda siempre llena, tu caja siempre arriba.",
+        textOverlay: "-80% no-shows",
+      },
+      {
+        time: "22-30s",
+        visual: "Logo Impulsala + CTA.",
+        voiceover: "Si tenés spa, peluquería, barbería o nail bar, esto lo tenés en 2 semanas. Videollamada gratis.",
+        textOverlay: "Videollamada gratis → impulsala.com",
+      },
+    ],
+    cta: "Reservas online para spa/peluquería: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#Spa", "#Peluqueria", "#ReservasOnline", "#Bogota", "#Belleza", "#Impulsala", "#Barberia"],
+  },
+
+  // ===== GUIONES POR TIPO DE NEGOCIO: EDUCACIÓN =====
+  {
+    id: "educacion-web-1",
+    type: "tutorial",
+    service: "web",
+    business: "educacion",
+    title: "Colegios y academias: web con matrículas online",
+    duration: "40s",
+    platform: "Reels / YouTube Shorts",
+    hook: "Tu colegio o academia pierde matrículas porque el proceso es engorroso. Con matrículas online, duplicás inscripciones.",
+    scenes: [
+      {
+        time: "0-5s",
+        visual: "Padre frustrado llenando formularios en papel. Luego fila para pagar.",
+        voiceover: "Tu colegio o academia pierde matrículas porque el proceso es engorroso. Con matrículas online, duplicás inscripciones.",
+        textOverlay: "Matrículas engorrosas = -50% inscripciones",
+      },
+      {
+        time: "5-15s",
+        visual: "Captura: web con formulario de matrícula online. Padre completa en 5 minutos desde casa. Paga con Wompi.",
+        voiceover: "Formulario de matrícula online. Padre lo completa en 5 minutos desde casa. Adjunta documentos, paga matrícula con Wompi. Todo guardado en tu sistema.",
+        textOverlay: "Matrícula en 5 minutos",
+      },
+      {
+        time: "15-25s",
+        visual: "Captura: panel de control con todas las matrículas. Comunicación automática con padres.",
+        voiceover: "Panel donde ves todas las matrículas, pagos pendientes, documentos. Comunicación automática con padres por email y WhatsApp: recordatorios, notificaciones, calificaciones.",
+        textOverlay: "Panel de control + comunicación",
+      },
+      {
+        time: "25-35s",
+        visual: "Estadísticas: +120% matrículas, -90% tiempo administrativo, +95% satisfacción padres.",
+        voiceover: "Resultados: 120% más matrículas, 90% menos tiempo administrativo, 95% satisfacción de padres. Tu personal se enfoca en enseñar, no en papeleo.",
+        textOverlay: "+120% matrículas · -90% papeleo",
+      },
+      {
+        time: "35-40s",
+        visual: "Logo Impulsala + CTA.",
+        voiceover: "Si tenés colegio, academia, curso online o instituto, esto lo tenés en 3 semanas. Videollamada gratis.",
+        textOverlay: "Videollamada gratis → impulsala.com",
+      },
+    ],
+    cta: "Matrículas online para educación: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#Educacion", "#Colegios", "#Academias", "#Bogota", "#Colombia", "#Impulsala", "#Matriculas"],
+  },
+
+  // ===== GUIONES POR TIPO DE NEGOCIO: SALUD =====
+  {
+    id: "salud-web-1",
+    type: "reel",
+    service: "web",
+    business: "salud",
+    title: "Clínicas y consultorios: citas online + historia clínica digital",
+    duration: "35s",
+    platform: "Reels / YouTube Shorts",
+    hook: "Tu clínica pierde pacientes porque el WhatsApp no lo atendés rápido. Con citas online + historia clínica digital, automatizás todo.",
+    scenes: [
+      {
+        time: "0-5s",
+        visual: "Paciente con dolor llamando a clínica. Nadie contesta. Paciente va a otra clínica.",
+        voiceover: "Tu clínica pierde pacientes porque el WhatsApp no lo atendés rápido. Con citas online + historia clínica digital, automatizás todo.",
+        textOverlay: "Paciente perdido = -$200.000 COP",
+      },
+      {
+        time: "5-15s",
+        visual: "Captura: web de clínica con calendario de disponibilidad por médico. Paciente elige hora, especialista, reason de consulta.",
+        voiceover: "Calendario online con disponibilidad por médico. Paciente elige especialista, hora y motivo de consulta. Se le manda confirmación y recordatorio.",
+        textOverlay: "Citas online 24/7",
+      },
+      {
+        time: "15-25s",
+        visual: "Captura: historia clínica digital. Doctor ve antecedentes, recetas anteriores, alergias.",
+        voiceover: "Historia clínica digital: antecedentes, medicamentos, alergias, recetas anteriores. Tu doctor entra y tiene todo el contexto. Cero papel, cero pérdidas.",
+        textOverlay: "Historia clínica digital",
+      },
+      {
+        time: "25-35s",
+        visual: "Logo Impulsala + CTA.",
+        voiceover: "Si tenés clínica, consultorio, odontólogo o veterinaria, esto lo tenés en 4 semanas. Cumple normatividad de protección de datos. Videollamada gratis.",
+        textOverlay: "Videollamada gratis → impulsala.com",
+      },
+    ],
+    cta: "Citas + historia clínica digital: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#Clinica", "#Salud", "#CitasOnline", "#Bogota", "#Medicos", "#Impulsala", "#HistoriaClinica"],
+  },
+
+  // ===== GUIONES POR TIPO DE NEGOCIO: PROFESIONAL (abogado, contador, etc) =====
+  {
+    id: "profesional-seo-1",
+    type: "tutorial",
+    service: "seo",
+    business: "profesional",
+    title: "Abogados: cómo aparecer primero en Google cuando buscan tus servicios",
+    duration: "50s",
+    platform: "YouTube Shorts / Reels",
+    hook: "Si sos abogado, contador o arquitecto y no aparecés en Google cuando alguien busca tu servicio, estás perdiendo clientes. Te muestro cómo aparecer primero.",
+    scenes: [
+      {
+        time: "0-5s",
+        visual: "Google search: 'abogado divorcios Bogotá'. Solo 3 resultados orgánicos aparecen arriba. Tu competencia, no vos.",
+        voiceover: "Si sos abogado, contador o arquitecto y no aparecés en Google cuando alguien busca tu servicio, estás perdiendo clientes. Te muestro cómo aparecer primero.",
+        textOverlay: "¿No aparecés en Google? = Clientes perdidos",
+      },
+      {
+        time: "5-15s",
+        visual: "Captura: 3 pasos SEO — keywords correctas, contenido optimizado, autoridad.",
+        voiceover: "Tres cosas: 1) Investigar qué buscan tus clientes (ej: 'abogado divorcios Bogotá'). 2) Crear contenido optimizado para esas keywords. 3) Conseguir links de otros sitios que te mencionen.",
+        textOverlay: "Keywords · Contenido · Autoridad",
+      },
+      {
+        time: "15-25s",
+        visual: "Captura: artículos de blog en web del abogado. 'Cómo tramitar divorcio en Colombia 2026'.",
+        voiceover: "Ejemplo: escribimos artículo 'Cómo tramitar divorcio en Colombia 2026'. Aparece primero en Google. El cliente lo lee, te contacta. Es tu cliente.",
+        textOverlay: "Artículo que convierte en cliente",
+      },
+      {
+        time: "25-35s",
+        visual: "Estadísticas: +210% tráfico orgánico, 78% aparece en top 3 Google.",
+        voiceover: "Resultados: 210% más tráfico orgánico. 78% de las keywords en top 3 de Google. Es decir: 8 de cada 10 búsquedas, aparecemos primeros.",
+        textOverlay: "+210% tráfico · 78% top 3 Google",
+      },
+      {
+        time: "35-50s",
+        visual: "Logo Impulsala + CTA.",
+        voiceover: "Si sos profesional independiente, agenda auditoría SEO gratis. Te decimos qué están buscando tus clientes y cómo aparecer primero.",
+        textOverlay: "Auditoría gratis → impulsala.com",
+      },
+    ],
+    cta: "SEO para profesionales: impulsala.com · WhatsApp: 319 635 4992",
+    hashtags: ["#Abogados", "#Contadores", "#SEO", "#Bogota", "#Profesionales", "#Impulsala", "#Google"],
+  },
+
+  // ===== GUIONES BRAND / GENERAL (mantener algunos existentes) =====
   {
     id: "brand-1",
     type: "promocion",
     service: "general",
+    business: "general",
     title: "Impulsala: tu partner estratégico digital en Bogotá",
     duration: "40s",
     platform: "Reels / YouTube Shorts",
@@ -400,7 +588,7 @@ const SCRIPTS: Script[] = [
         time: "25-35s",
         visual: "Testimonios breves de clientes felices. Estadísticas: 4.9/5 estrellas.",
         voiceover: "Nuestros clientes nos califican con 4.9 de 5 estrellas. Por algo será. No vendemos humo: entregamos resultados medibles.",
-        textOverlay: "4.9/5 ⭐⭐⭐⭐⭐",
+        textOverlay: "4.9/5 estrellas",
       },
       {
         time: "35-40s",
@@ -416,6 +604,7 @@ const SCRIPTS: Script[] = [
     id: "brand-2",
     type: "hook",
     service: "general",
+    business: "general",
     title: "Resultado garantizado o seguimos sin costo",
     duration: "20s",
     platform: "TikTok / Reels",
@@ -453,12 +642,28 @@ const SERVICE_LABELS: Record<ServiceType, string> = {
   ia: "Automatización IA",
 };
 
-const TYPE_LABELS: Record<ScriptType, string> = {
-  hook: "Hook (15-25s)",
-  reel: "Reel completo (30s)",
-  testimonio: "Testimonio cliente",
-  tutorial: "Tutorial educativo",
-  promocion: "Promoción marca",
+const BUSINESS_LABELS: Record<BusinessType, string> = {
+  general: "General",
+  restaurante: "Restaurantes",
+  inmobiliaria: "Inmobiliarias",
+  gimnasio: "Gimnasios / Fitness",
+  retail: "Tiendas / Retail",
+  belleza: "Spa / Peluquería",
+  educacion: "Educación",
+  salud: "Salud / Clínicas",
+  profesional: "Profesionales",
+};
+
+const BUSINESS_ICONS: Record<BusinessType, React.ComponentType<{ className?: string }>> = {
+  general: Sparkles,
+  restaurante: Utensils,
+  inmobiliaria: Home,
+  gimnasio: Dumbbell,
+  retail: ShoppingBag,
+  belleza: Scissors,
+  educacion: GraduationCap,
+  salud: Stethoscope,
+  profesional: Briefcase,
 };
 
 const SERVICE_ICONS: Record<ServiceType, React.ComponentType<{ className?: string }>> = {
@@ -469,14 +674,24 @@ const SERVICE_ICONS: Record<ServiceType, React.ComponentType<{ className?: strin
   ia: Bot,
 };
 
+const TYPE_LABELS: Record<ScriptType, string> = {
+  hook: "Hook (15-25s)",
+  reel: "Reel completo (30s)",
+  testimonio: "Testimonio cliente",
+  tutorial: "Tutorial educativo",
+  promocion: "Promoción marca",
+};
+
 export function CrmMarketing() {
   const [filterService, setFilterService] = useState<ServiceType | "all">("all");
+  const [filterBusiness, setFilterBusiness] = useState<BusinessType | "all">("all");
   const [filterType, setFilterType] = useState<ScriptType | "all">("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const filtered = SCRIPTS.filter((s) => {
     if (filterService !== "all" && s.service !== filterService) return false;
+    if (filterBusiness !== "all" && s.business !== filterBusiness) return false;
     if (filterType !== "all" && s.type !== filterType) return false;
     return true;
   });
@@ -491,7 +706,7 @@ export function CrmMarketing() {
   const formatScript = (script: Script): string => {
     let text = `🎬 ${script.title}\n`;
     text += `Duración: ${script.duration} | Plataforma: ${script.platform}\n`;
-    text += `Servicio: ${SERVICE_LABELS[script.service]}\n\n`;
+    text += `Servicio: ${SERVICE_LABELS[script.service]} | Negocio: ${BUSINESS_LABELS[script.business]}\n\n`;
     text += `HOOK:\n${script.hook}\n\n`;
     text += `ESCENAS:\n`;
     script.scenes.forEach((sc, i) => {
@@ -516,31 +731,52 @@ export function CrmMarketing() {
           <div>
             <h2 className="text-lg font-bold text-foreground">Guiones para Videos de Marketing</h2>
             <p className="text-xs text-muted-foreground">
-              Guiones listos para TikTok, Reels y YouTube Shorts. Cópialos, dáselos a Hermes y graba.
+              Guiones por tipo de negocio y servicio. TikTok, Reels, YouTube Shorts. Copialos y dáselos a Hermes.
             </p>
           </div>
         </div>
         <div className="flex flex-wrap gap-3 mt-3 text-xs">
           <span className="flex items-center gap-1.5 text-muted-foreground">
             <Target className="w-3.5 h-3.5 text-emerald-400" />
-            {SCRIPTS.length} guiones disponibles
+            {SCRIPTS.length} guiones
           </span>
           <span className="flex items-center gap-1.5 text-muted-foreground">
-            <TrendingUp className="w-3.5 h-3.5 text-violet-400" />
-            4 servicios cubiertos
+            <Briefcase className="w-3.5 h-3.5 text-violet-400" />
+            8 tipos de negocio
+          </span>
+          <span className="flex items-center gap-1.5 text-muted-foreground">
+            <TrendingUp className="w-3.5 h-3.5 text-fuchsia-400" />
+            4 servicios
           </span>
           <span className="flex items-center gap-1.5 text-muted-foreground">
             <Clock className="w-3.5 h-3.5 text-amber-400" />
-            20s a 60s de duración
+            20s a 60s
           </span>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex-1">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-            Filtrar por servicio
+            Tipo de negocio
+          </label>
+          <select
+            value={filterBusiness}
+            onChange={(e) => setFilterBusiness(e.target.value as BusinessType | "all")}
+            className="w-full px-3 py-2 bg-card/60 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+          >
+            <option value="all">Todos los negocios</option>
+            {(Object.keys(BUSINESS_LABELS) as BusinessType[]).map((b) => (
+              <option key={b} value={b}>
+                {BUSINESS_LABELS[b]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+            Servicio
           </label>
           <select
             value={filterService}
@@ -555,9 +791,9 @@ export function CrmMarketing() {
             ))}
           </select>
         </div>
-        <div className="flex-1">
+        <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-            Filtrar por tipo
+            Tipo de video
           </label>
           <select
             value={filterType}
@@ -582,7 +818,8 @@ export function CrmMarketing() {
           </div>
         ) : (
           filtered.map((script) => {
-            const Icon = SERVICE_ICONS[script.service];
+            const ServiceIcon = SERVICE_ICONS[script.service];
+            const BizIcon = BUSINESS_ICONS[script.business];
             const isExpanded = expandedId === script.id;
             const isCopied = copiedId === script.id;
             return (
@@ -590,12 +827,16 @@ export function CrmMarketing() {
                 key={script.id}
                 className="backdrop-blur-xl bg-card/60 border border-border/50 rounded-2xl overflow-hidden transition-all hover:border-fuchsia-500/40"
               >
-                {/* Header del guion */}
                 <div className="p-4 cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : script.id)}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <Icon className="w-4 h-4 text-fuchsia-400 flex-shrink-0" />
+                      <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                        <BizIcon className="w-4 h-4 text-violet-400 flex-shrink-0" />
+                        <span className="text-[10px] uppercase tracking-wider font-semibold text-violet-400">
+                          {BUSINESS_LABELS[script.business]}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">·</span>
+                        <ServiceIcon className="w-3.5 h-3.5 text-fuchsia-400 flex-shrink-0" />
                         <span className="text-[10px] uppercase tracking-wider font-semibold text-fuchsia-400">
                           {SERVICE_LABELS[script.service]}
                         </span>
@@ -627,7 +868,7 @@ export function CrmMarketing() {
                   </div>
                 </div>
 
-                {/* Hook preview (siempre visible) */}
+                {/* Hook preview */}
                 <div className="px-4 pb-3">
                   <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2">
                     <div className="flex items-center gap-1.5 mb-1">
@@ -734,7 +975,9 @@ export function CrmMarketing() {
           Cómo usar estos guiones
         </h3>
         <ol className="text-xs text-muted-foreground space-y-1.5 list-decimal list-inside">
-          <li>Elegí el guion según el servicio que querés promocionar</li>
+          <li>Elegí el tipo de negocio que querés promocionar (restaurante, inmobiliaria, etc.)</li>
+          <li>Elegí el servicio (web, SEO, Ads, IA)</li>
+          <li>Hacé clic en el guion para expandirlo y ver todas las escenas</li>
           <li>Hacé clic en "Copiar guion completo"</li>
           <li>Pasale el texto a Hermes (o al editor de video)</li>
           <li>Grabá las escenas según las indicaciones visuales</li>

@@ -15,6 +15,7 @@ import {
   X,
   ShieldCheck,
   Video,
+  Target,
 } from "lucide-react";
 import { CrmDashboard } from "./dashboard";
 import { CrmKanban } from "./kanban";
@@ -23,8 +24,9 @@ import { CrmNewsletter } from "./newsletter";
 import { CrmCampaigns } from "./campaigns";
 import { CrmBlog } from "./blog";
 import { CrmMarketing } from "./marketing";
+import { CrmProspeccion } from "./prospeccion";
 
-type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "blog" | "marketing";
+type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "marketing" | "prospeccion" | "blog";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -61,7 +63,13 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string 
     id: "marketing",
     label: "Marketing / Videos",
     icon: <Video className="w-4 h-4" />,
-    description: "Guiones para TikTok, Reels y YouTube Shorts",
+    description: "Guiones para TikTok, Reels y YouTube Shorts por tipo de negocio",
+  },
+  {
+    id: "prospeccion",
+    label: "Prospección IA",
+    icon: <Target className="w-4 h-4" />,
+    description: "Buscá negocios con IA y generá propuestas automáticas",
   },
   {
     id: "blog",
@@ -209,6 +217,7 @@ export function CrmApp({ userEmail }: { userEmail: string }) {
           {tab === "newsletter" && <CrmNewsletter />}
           {tab === "campaigns" && <CrmCampaigns />}
           {tab === "marketing" && <CrmMarketing />}
+          {tab === "prospeccion" && <CrmProspeccion />}
           {tab === "blog" && <CrmBlog />}
         </main>
       </div>
