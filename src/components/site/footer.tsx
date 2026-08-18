@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Instagram, Youtube, Facebook, Mail, Phone, MapPin, Send, Loader2, CheckCircle2, Lock } from "lucide-react";
+import { Instagram, Youtube, Facebook, Mail, Phone, MapPin, Send, Loader2, CheckCircle2 } from "lucide-react";
 import { LegalModal, type LegalDoc } from "@/components/site/legal-modal";
 import { useToast } from "@/hooks/use-toast";
 
@@ -268,14 +268,6 @@ export function Footer() {
               <button onClick={() => setLegalDoc("terminos")} className="transition-colors hover:text-foreground">
                 Términos de Servicio
               </button>
-              <Link
-                href="/crm"
-                className="flex items-center gap-1 transition-colors hover:text-foreground"
-                title="Acceso administrativo"
-              >
-                <Lock className="w-3 h-3" />
-                CRM
-              </Link>
             </div>
           </div>
         </div>

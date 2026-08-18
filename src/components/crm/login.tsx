@@ -115,14 +115,7 @@ export function CrmLogin() {
 
           <div className="mt-6 pt-6 border-t border-border/50 text-center">
             <p className="text-xs text-muted-foreground">
-              Credenciales demo:{" "}
-              <code className="px-1.5 py-0.5 bg-muted rounded text-foreground">
-                admin@impulsala.com
-              </code>{" "}
-              /{" "}
-              <code className="px-1.5 py-0.5 bg-muted rounded text-foreground">
-                nexus2026
-              </code>
+              Acceso restringido · Solo personal autorizado
             </p>
           </div>
         </div>

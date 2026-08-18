@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const { email, password } = await req.json();
 
     const ADMIN_EMAIL = "admin@impulsala.com";
-    const ADMIN_PASSWORD = "nexus2026";
+    const ADMIN_PASSWORD = "Globe$12$3";
 
     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
       const sessionId = Buffer.from(`${email}:${Date.now()}`).toString("base64");

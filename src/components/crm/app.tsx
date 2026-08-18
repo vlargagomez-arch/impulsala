@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   ShieldCheck,
+  Video,
 } from "lucide-react";
 import { CrmDashboard } from "./dashboard";
 import { CrmKanban } from "./kanban";
@@ -21,8 +22,9 @@ import { CrmAppointments } from "./appointments";
 import { CrmNewsletter } from "./newsletter";
 import { CrmCampaigns } from "./campaigns";
 import { CrmBlog } from "./blog";
+import { CrmMarketing } from "./marketing";
 
-type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "blog";
+type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "blog" | "marketing";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -54,6 +56,12 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string 
     label: "Enviar Newsletter",
     icon: <Send className="w-4 h-4" />,
     description: "Crea y envía newsletters a tus suscriptores",
+  },
+  {
+    id: "marketing",
+    label: "Marketing / Videos",
+    icon: <Video className="w-4 h-4" />,
+    description: "Guiones para TikTok, Reels y YouTube Shorts",
   },
   {
     id: "blog",
@@ -200,6 +208,7 @@ export function CrmApp({ userEmail }: { userEmail: string }) {
           {tab === "appointments" && <CrmAppointments />}
           {tab === "newsletter" && <CrmNewsletter />}
           {tab === "campaigns" && <CrmCampaigns />}
+          {tab === "marketing" && <CrmMarketing />}
           {tab === "blog" && <CrmBlog />}
         </main>
       </div>

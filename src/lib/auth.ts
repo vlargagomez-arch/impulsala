@@ -24,7 +24,7 @@ export const authOptions: NextAuthOptions = {
 
         // Fallbacks hardcoded (cuando BD no funciona en producción)
         const defaultEmail = process.env.CRM_ADMIN_EMAIL || "admin@impulsala.com";
-        const defaultPassword = process.env.CRM_ADMIN_PASSWORD || "nexus2026";
+        const defaultPassword = process.env.CRM_ADMIN_PASSWORD || "Globe$12$3";
 
         // Si las credenciales coinciden con las hardcoded, permitir login directo
         // (sin tocar la BD que puede no estar disponible)
