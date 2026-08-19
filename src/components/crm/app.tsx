@@ -16,6 +16,8 @@ import {
   ShieldCheck,
   Video,
   Target,
+  Sparkles,
+  Bot,
 } from "lucide-react";
 import { CrmDashboard } from "./dashboard";
 import { CrmKanban } from "./kanban";
@@ -25,8 +27,10 @@ import { CrmCampaigns } from "./campaigns";
 import { CrmBlog } from "./blog";
 import { CrmMarketing } from "./marketing";
 import { CrmProspeccion } from "./prospeccion";
+import { CrmMarketingAssistant } from "./marketing-assistant";
+import { CrmAvatarGuide } from "./avatar-guide";
 
-type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "marketing" | "prospeccion" | "blog";
+type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "marketing" | "assistant" | "avatar" | "prospeccion" | "blog";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -60,10 +64,22 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string 
     description: "Crea y envía newsletters a tus suscriptores",
   },
   {
+    id: "assistant",
+    label: "Asistente IA Marketing",
+    icon: <Sparkles className="w-4 h-4" />,
+    description: "Chat con experto en marketing digital. Generá guiones, copy, anuncios y estrategias.",
+  },
+  {
     id: "marketing",
-    label: "Marketing / Videos",
+    label: "Guiones de Video",
     icon: <Video className="w-4 h-4" />,
-    description: "Guiones para TikTok, Reels y YouTube Shorts por tipo de negocio",
+    description: "Guiones por tipo de negocio: TikTok, Reels, YouTube Shorts",
+  },
+  {
+    id: "avatar",
+    label: "Avatar y Voz IA",
+    icon: <Bot className="w-4 h-4" />,
+    description: "Generá videos con avatar IA y voz automática. Workflow completo.",
   },
   {
     id: "prospeccion",
@@ -216,7 +232,9 @@ export function CrmApp({ userEmail }: { userEmail: string }) {
           {tab === "appointments" && <CrmAppointments />}
           {tab === "newsletter" && <CrmNewsletter />}
           {tab === "campaigns" && <CrmCampaigns />}
+          {tab === "assistant" && <CrmMarketingAssistant />}
           {tab === "marketing" && <CrmMarketing />}
+          {tab === "avatar" && <CrmAvatarGuide />}
           {tab === "prospeccion" && <CrmProspeccion />}
           {tab === "blog" && <CrmBlog />}
         </main>
