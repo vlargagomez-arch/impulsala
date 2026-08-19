@@ -908,36 +908,88 @@ export function CrmMarketing() {
             </div>
           </div>
 
-          {/* Pasos de instalación */}
+          {/* Pasos de instalación en la nube */}
           <div className="rounded-lg bg-background/40 border border-border/40 p-3">
             <p className="text-[11px] font-bold text-foreground mb-2 flex items-center gap-1.5">
               <Play className="w-3 h-3 text-emerald-400" />
-              Instalación (15 minutos)
+              Opciones en la nube (sin usar tu compu)
             </p>
-            <ol className="text-[11px] text-muted-foreground space-y-1.5 list-decimal list-inside">
-              <li>Instalá Python 3.10+ y FFmpeg</li>
-              <li>
-                Cloná el repo:{" "}
-                <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">
-                  git clone https://github.com/harry0703/MoneyPrinterTurbo.git
-                </code>
-              </li>
-              <li>
-                Instalá dependencias:{" "}
-                <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">
-                  pip install -r requirements.txt
-                </code>
-              </li>
-              <li>Configurá <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">config.toml</code> con tus API keys (Pexels y Pixabay son gratis)</li>
-              <li>
-                Lanzá la WebUI:{" "}
-                <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">
-                  streamlit run ./webui/Main.py
-                </code>
-              </li>
-              <li>Abrió en <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">http://localhost:8501</code></li>
-              <li>Pegás el guion del CRM → elegís voz <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">es-CO-SalomeNeural</code> → Click "Generate"</li>
-            </ol>
+
+            {/* Opción 1: Google Colab */}
+            <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-2.5 mb-2">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                  <span className="text-base">🥇</span>
+                  Google Colab (gratis, 12.7 GB RAM)
+                </p>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  RECOMENDADO
+                </span>
+              </div>
+              <p className="text-[10px] text-muted-foreground mb-1">
+                Notebook oficial del autor. Abrís, ejecutás 3 celdas, y tenés la WebUI pública.
+              </p>
+              <ol className="text-[10px] text-muted-foreground space-y-0.5 list-decimal list-inside">
+                <li>Entrá a: <code className="px-1 py-0.5 bg-muted rounded text-foreground text-[9px]">colab.research.google.com/github/harry0703/MoneyPrinterTurbo</code></li>
+                <li>Crear cuenta ngrok gratis (para túnel): <code className="px-1 py-0.5 bg-muted rounded text-foreground text-[9px]">ngrok.com</code></li>
+                <li>Pegar tu token de ngrok en la celda correspondiente</li>
+                <li>Ejecutar las celdas → te da URL pública</li>
+              </ol>
+              <p className="text-[9px] text-muted-foreground mt-1">
+                ✅ 100% gratis · ✅ 12.7 GB RAM · ✅ sin tocar tu compu · ⚠️ 12h por sesión
+              </p>
+            </div>
+
+            {/* Opción 2: GitHub Codespaces */}
+            <div className="rounded-lg bg-violet-500/10 border border-violet-500/20 p-2.5 mb-2">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                  <span className="text-base">🥈</span>
+                  GitHub Codespaces (gratis 60h/mes, 16 GB RAM)
+                </p>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                  ALTERNATIVA
+                </span>
+              </div>
+              <p className="text-[10px] text-muted-foreground mb-1">
+                Usá la infraestructura de GitHub desde el navegador. 16 GB RAM gratis.
+              </p>
+              <ol className="text-[10px] text-muted-foreground space-y-0.5 list-decimal list-inside">
+                <li>Hacé fork del repo en GitHub</li>
+                <li>Botón verde "Code" → "Create codespace on main"</li>
+                <li>En la terminal: <code className="px-1 py-0.5 bg-muted rounded text-foreground text-[9px]">pip install -r requirements.txt</code></li>
+                <li><code className="px-1 py-0.5 bg-muted rounded text-foreground text-[9px]">streamlit run webui/Main.py --server.port=8501 --server.address=0.0.0.0</code></li>
+                <li>VSCode web abre automáticamente el puerto → URL lista</li>
+              </ol>
+              <p className="text-[9px] text-muted-foreground mt-1">
+                ✅ 16 GB RAM · ✅ 60h/mes gratis · ✅ sin tocar tu compu · ⚠️ se cae si inactivo
+              </p>
+            </div>
+
+            {/* Opción 3: Railway */}
+            <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2.5">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                  <span className="text-base">🥉</span>
+                  Railway ($5/mes, 24/7 URL permanente)
+                </p>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  PERSISTENTE
+                </span>
+              </div>
+              <p className="text-[10px] text-muted-foreground mb-1">
+                URL pública 24/7. Mejor si vas a generar muchos videos.
+              </p>
+              <ol className="text-[10px] text-muted-foreground space-y-0.5 list-decimal list-inside">
+                <li>Fork del repo en GitHub</li>
+                <li>Entrá a <code className="px-1 py-0.5 bg-muted rounded text-foreground text-[9px]">railway.app</code> → New Project → Deploy from GitHub</li>
+                <li>Railway detecta el Dockerfile y deploya solo</li>
+                <li>URL: <code className="px-1 py-0.5 bg-muted rounded text-foreground text-[9px]">https://tu-proyecto.up.railway.app</code></li>
+              </ol>
+              <p className="text-[9px] text-muted-foreground mt-1">
+                ✅ 24/7 URL · ✅ 8 GB RAM · ⚠️ $5/mes · ✅ sin tocar tu compu
+              </p>
+            </div>
           </div>
 
           {/* Config gratis */}
