@@ -848,6 +848,212 @@ export function CrmMarketing() {
         </div>
       </div>
 
+      {/* RUTA DE VIDEO AUTOMÁTICO 100% */}
+      <div className="backdrop-blur-xl bg-gradient-to-br from-violet-500/10 via-fuchsia-500/5 to-transparent border border-violet-500/30 rounded-2xl p-5">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg shadow-violet-500/30">
+            <Zap className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-foreground">
+              Ruta de Video 100% Automático
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Le das un guion → te entrega el video terminado. Sin editar nada. 100% automático.
+            </p>
+          </div>
+        </div>
+
+        {/* MoneyPrinterTurbo - destacado */}
+        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4 mb-3">
+          <div className="flex items-start justify-between mb-2 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🤖</span>
+              <div>
+                <h4 className="text-sm font-bold text-foreground flex items-center gap-2 flex-wrap">
+                  MoneyPrinterTurbo
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 uppercase font-bold">
+                    Recomendado #1
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">⭐ 66.000 estrellas</span>
+                </h4>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  Pipeline completo: guion → narración → subtítulos → música → animaciones → video final
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://github.com/harry0703/MoneyPrinterTurbo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 transition-all"
+            >
+              <ExternalLink className="w-3 h-3" />
+              Abrir repo
+            </a>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3 text-[11px]">
+            <div className="flex items-center gap-1.5 text-emerald-300">
+              <Check className="w-3 h-3" /> Sin GPU (CPU)
+            </div>
+            <div className="flex items-center gap-1.5 text-emerald-300">
+              <Check className="w-3 h-3" /> 100% gratis
+            </div>
+            <div className="flex items-center gap-1.5 text-emerald-300">
+              <Check className="w-3 h-3" /> WebUI en español
+            </div>
+            <div className="flex items-center gap-1.5 text-emerald-300">
+              <Check className="w-3 h-3" /> Voces colombianas
+            </div>
+          </div>
+
+          {/* Pasos de instalación */}
+          <div className="rounded-lg bg-background/40 border border-border/40 p-3">
+            <p className="text-[11px] font-bold text-foreground mb-2 flex items-center gap-1.5">
+              <Play className="w-3 h-3 text-emerald-400" />
+              Instalación (15 minutos)
+            </p>
+            <ol className="text-[11px] text-muted-foreground space-y-1.5 list-decimal list-inside">
+              <li>Instalá Python 3.10+ y FFmpeg</li>
+              <li>
+                Cloná el repo:{" "}
+                <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">
+                  git clone https://github.com/harry0703/MoneyPrinterTurbo.git
+                </code>
+              </li>
+              <li>
+                Instalá dependencias:{" "}
+                <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">
+                  pip install -r requirements.txt
+                </code>
+              </li>
+              <li>Configurá <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">config.toml</code> con tus API keys (Pexels y Pixabay son gratis)</li>
+              <li>
+                Lanzá la WebUI:{" "}
+                <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">
+                  streamlit run ./webui/Main.py
+                </code>
+              </li>
+              <li>Abrió en <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">http://localhost:8501</code></li>
+              <li>Pegás el guion del CRM → elegís voz <code className="px-1.5 py-0.5 bg-muted rounded text-foreground text-[10px]">es-CO-SalomeNeural</code> → Click "Generate"</li>
+            </ol>
+          </div>
+
+          {/* Config gratis */}
+          <div className="mt-3 rounded-lg bg-violet-500/10 border border-violet-500/30 p-3">
+            <p className="text-[11px] font-bold text-foreground mb-1">💡 Configuración 100% GRATIS:</p>
+            <ul className="text-[11px] text-muted-foreground space-y-0.5">
+              <li>• LLM: <code className="px-1 bg-muted rounded text-foreground text-[10px]">ollama</code> (local, gratis) en vez de OpenAI</li>
+              <li>• TTS: <code className="px-1 bg-muted rounded text-foreground text-[10px]">edge-tts</code> (gratis, voces colombianas)</li>
+              <li>• Footage: Pexels + Pixabay (APIs gratis)</li>
+              <li>• Subtítulos: Whisper local (gratis)</li>
+            </ul>
+          </div>
+
+          {/* Qué hace automáticamente */}
+          <div className="mt-3">
+            <p className="text-[11px] font-bold text-foreground mb-2">Lo que hace SOLO:</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              {[
+                "Genera guion con IA (o usás el del CRM)",
+                "Busca videos de stock automáticos",
+                "Genera narración con voz colombiana",
+                "Crea subtítulos sincronizados",
+                "Agrega música de fondo automática",
+                "Hace transiciones y animaciones",
+                "Exporta en 9:16 (TikTok/Reels)",
+                "Listo para publicar en redes",
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-1.5 text-[11px] text-foreground/80">
+                  <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Alternativas */}
+        <p className="text-xs font-bold text-foreground mb-2 mt-4">Alternativas:</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {[
+            {
+              name: "ShortsGenerator",
+              stars: "2k⭐",
+              desc: "Canal automático que publica 3 veces/día. Scheduling nativo.",
+              url: "https://github.com/leamsigc/ShortsGenerator",
+              icon: "📺",
+            },
+            {
+              name: "NarratoAI",
+              stars: "4k⭐",
+              desc: "Videos narrados largos (1-5 min). Formato documental.",
+              url: "https://github.com/linyqh/NarratoAI",
+              icon: "🎙️",
+            },
+            {
+              name: "ShortGPT",
+              stars: "5.5k⭐",
+              desc: "Framework modular para devs. Customizás tu pipeline.",
+              url: "https://github.com/RayVentura/ShortGPT",
+              icon: "🔧",
+            },
+            {
+              name: "Viral Faceless",
+              stars: "700⭐",
+              desc: "Shorts faceless con Docker. Gemini free + Edge TTS.",
+              url: "https://github.com/Dark2C/Viral-Faceless-Shorts-Generator",
+              icon: "🎭",
+            },
+          ].map((alt) => (
+            <a
+              key={alt.name}
+              href={alt.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-2 p-2.5 rounded-lg bg-card/40 border border-border/40 hover:border-violet-500/40 transition-all"
+            >
+              <span className="text-base">{alt.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-foreground">{alt.name} <span className="text-[9px] text-muted-foreground">{alt.stars}</span></p>
+                <p className="text-[10px] text-muted-foreground">{alt.desc}</p>
+              </div>
+              <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-0.5" />
+            </a>
+          ))}
+        </div>
+
+        {/* Workflow recomendado */}
+        <div className="mt-4 p-3 rounded-lg bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/20">
+          <p className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            Workflow recomendado para Impulsala
+          </p>
+          <div className="space-y-1.5 text-[11px] text-foreground/80">
+            <div className="flex items-center gap-2">
+              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-violet-500 flex items-center justify-center text-white text-[9px] font-bold">1</span>
+              <span>Elegí un guion en el CRM → Marketing Digital → copialo</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-violet-500 flex items-center justify-center text-white text-[9px] font-bold">2</span>
+              <span>MoneyPrinterTurbo → pegás el guion → voz "es-CO-SalomeNeural"</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-violet-500 flex items-center justify-center text-white text-[9px] font-bold">3</span>
+              <span>Click "Generate" → esperás 5 min → video listo</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[9px] font-bold">4</span>
+              <span>Subís a TikTok, Reels y YouTube Shorts con los hashtags</span>
+            </div>
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-2 pt-2 border-t border-border/30">
+            ⏱️ Tiempo total: <strong className="text-foreground">10 minutos por video</strong> · 💰 Costo: <strong className="text-foreground">$0 USD</strong>
+          </p>
+        </div>
+      </div>
+
       {/* Audio element hidden for scene playback */}
       <audio ref={audioRef} className="hidden" />
     </div>
