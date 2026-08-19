@@ -210,38 +210,140 @@ const SCRIPT_CATEGORIES = [
 ];
 
 const VOICE_OPTIONS = [
-  { id: "es-CO-Salome", label: "Salomé - Colombiana Femenina", lang: "es" },
-  { id: "es-CO-Gonzalo", label: "Gonzalo - Colombiano Masculino", lang: "es" },
-  { id: "es-MX-Jorge", label: "Jorge - Mexicano Neutro", lang: "es" },
-  { id: "es-ES-Laura", label: "Laura - Española Femenina", lang: "es" },
+  { id: "es-CO-Salome", label: "Salomé - Colombia Femenina", emoji: "🇨🇴" },
+  { id: "es-CO-Gonzalo", label: "Gonzalo - Colombia Masculino", emoji: "🇨🇴" },
+  { id: "es-MX-Dalia", label: "Dalia - México Femenina", emoji: "🇲🇽" },
+  { id: "es-MX-Jorge", label: "Jorge - México Masculino", emoji: "🇲🇽" },
+  { id: "es-ES-Elvira", label: "Elvira - España Femenina", emoji: "🇪🇸" },
+  { id: "es-ES-Alvaro", label: "Álvaro - España Masculino", emoji: "🇪🇸" },
+  { id: "es-AR-Elena", label: "Elena - Argentina Femenina", emoji: "🇦🇷" },
+  { id: "es-AR-Tomas", label: "Tomás - Argentina Masculino", emoji: "🇦🇷" },
 ];
 
-const FREE_TOOLS = [
+const OPENSOURCE_TOOLS = [
   {
     name: "Edge TTS",
-    description: "Voz en español colombiano (Salomé/Gonzalo). 100% gratis, ilimitado.",
-    url: "https://github.com/rany2/edge-tts",
+    description: "Voces Neural de Microsoft en español. Calidad profesional. 100% gratis, ilimitado.",
+    url: "https://github.com/andresaya/edge-tts-node",
+    category: "Voz IA",
+    stars: "1k+",
     icon: "🎙️",
+    color: "from-emerald-500/15 to-teal-500/5 border-emerald-500/30",
+    badge: "RECOMENDADO",
+  },
+  {
+    name: "Coqui TTS (XTTS v2)",
+    description: "TTS open source con clonación de voz. 17 idiomas incluyendo español. Calidad humana.",
+    url: "https://github.com/coqui-ai/TTS",
+    category: "Voz IA",
+    stars: "35k+",
+    icon: "🔊",
+    color: "from-violet-500/15 to-purple-500/5 border-violet-500/30",
+    badge: "TOP",
+  },
+  {
+    name: "AllTalk TTS",
+    description: "Fork de Coqui con API REST JSON. Perfecto para integrar desde Node.js.",
+    url: "https://github.com/erew123/alltalk_tts",
+    category: "Voz IA",
+    stars: "2k+",
+    icon: "📡",
+    color: "from-violet-500/15 to-purple-500/5 border-violet-500/30",
+    badge: "API",
   },
   {
     name: "SadTalker",
-    description: "Avatar IA gratis. Subí una foto + audio y genera video hablado.",
-    url: "https://huggingface.co/spaces/ameerazam08/SadTalker",
+    description: "Avatar IA que habla a partir de una foto + audio. Lip-sync realista. 100% gratis.",
+    url: "https://github.com/OpenTalker/SadTalker",
+    category: "Avatar IA",
+    stars: "14k+",
     icon: "🤖",
+    color: "from-fuchsia-500/15 to-pink-500/5 border-fuchsia-500/30",
+    badge: "GRATIS",
   },
   {
-    name: "Vidnoz AI",
-    description: "Avatar IA con plan gratis (1 min/día). Sin tarjeta de crédito.",
-    url: "https://www.vidnoz.com",
+    name: "MuseTalk",
+    description: "Lip-sync en tiempo real. Mejor calidad que Wav2Lip. Para videos profesionales.",
+    url: "https://github.com/TMElyralab/MuseTalk",
+    category: "Avatar IA",
+    stars: "4k+",
     icon: "🎬",
+    color: "from-fuchsia-500/15 to-pink-500/5 border-fuchsia-500/30",
+    badge: "TIEMPO REAL",
   },
   {
-    name: "CapCut",
-    description: "Editor de video gratis. Tiene TTS integrado + avatares IA.",
-    url: "https://capcut.com",
-    icon: "✂️",
+    name: "Stable Diffusion WebUI",
+    description: "Generá imágenes IA para tus posts. API REST en /sdapi/v1/. 164k estrellas.",
+    url: "https://github.com/AUTOMATIC1111/stable-diffusion-webui",
+    category: "Imágenes IA",
+    stars: "164k+",
+    icon: "🎨",
+    color: "from-amber-500/15 to-orange-500/5 border-amber-500/30",
+    badge: "API REST",
+  },
+  {
+    name: "ComfyUI",
+    description: "Editor visual de flujos IA. Generación de imágenes con nodos. 128k estrellas.",
+    url: "https://github.com/comfyanonymous/ComfyUI",
+    category: "Imágenes IA",
+    stars: "128k+",
+    icon: "🖼️",
+    color: "from-amber-500/15 to-orange-500/5 border-amber-500/30",
+    badge: "API",
+  },
+  {
+    name: "Open-Sora",
+    description: "Generación de video con IA. Text-to-video. Open source de HPCAI Tech.",
+    url: "https://github.com/hpcaitech/Open-Sora",
+    category: "Video IA",
+    stars: "25k+",
+    icon: "🎥",
+    color: "from-sky-500/15 to-blue-500/5 border-sky-500/30",
+    badge: "TEXT-TO-VIDEO",
+  },
+  {
+    name: "VideoLingo",
+    description: "Traducción + doblaje de videos con IA. Para contenido multi-idioma automático.",
+    url: "https://github.com/Huanshere/VideoLingo",
+    category: "Video IA",
+    stars: "18k+",
+    icon: "🌍",
+    color: "from-sky-500/15 to-blue-500/5 border-sky-500/30",
+    badge: "DOBLAJE",
+  },
+  {
+    name: "Flowise",
+    description: "Automatización IA no-code. Orquesta todo el pipeline. Nativo Node.js.",
+    url: "https://github.com/FlowiseAI/Flowise",
+    category: "Automatización",
+    stars: "55k+",
+    icon: "⚡",
+    color: "from-rose-500/15 to-red-500/5 border-rose-500/30",
+    badge: "NODE.JS",
+  },
+  {
+    name: "Oobabooga TextGen",
+    description: "LLM local con API compatible con OpenAI. Generá copy, guiones, estrategias.",
+    url: "https://github.com/oobabooga/text-generation-webui",
+    category: "LLM Local",
+    stars: "40k+",
+    icon: "🧠",
+    color: "from-cyan-500/15 to-teal-500/5 border-cyan-500/30",
+    badge: "OPENAI API",
+  },
+  {
+    name: "Bark",
+    description: "TTS de Suno con sonidos naturales. Risas, suspiros, emociones. Multilingüe.",
+    url: "https://github.com/suno-ai/bark",
+    category: "Voz IA",
+    stars: "39k+",
+    icon: "🐶",
+    color: "from-emerald-500/15 to-teal-500/5 border-emerald-500/30",
+    badge: "EMOCIONES",
   },
 ];
+
+const TOOL_CATEGORIES = ["Voz IA", "Avatar IA", "Imágenes IA", "Video IA", "Automatización", "LLM Local"];
 
 export function CrmMarketing() {
   const [selectedCategory, setSelectedCategory] = useState<string>("restaurante-web");
@@ -372,10 +474,15 @@ export function CrmMarketing() {
 
       {/* Selector de voz */}
       <div>
-        <label className="text-xs font-medium text-muted-foreground mb-2 block">
-          2. Elegí la voz del avatar
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs font-medium text-muted-foreground">
+            2. Elegí la voz del avatar (Neural · más humanas)
+          </label>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            Powered by Microsoft Edge TTS
+          </span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
           {VOICE_OPTIONS.map((v) => (
             <button
               key={v.id}
@@ -386,8 +493,9 @@ export function CrmMarketing() {
                   : "border-border/60 bg-card/40 hover:border-emerald-500/30"
               }`}
             >
-              <Mic className={`w-3.5 h-3.5 ${selectedVoice === v.id ? "text-emerald-400" : "text-muted-foreground"}`} />
-              <span className="text-[11px] font-medium text-foreground">{v.label}</span>
+              <span className="text-base">{v.emoji}</span>
+              <Mic className={`w-3 h-3 flex-shrink-0 ${selectedVoice === v.id ? "text-emerald-400" : "text-muted-foreground"}`} />
+              <span className="text-[11px] font-medium text-foreground flex-1 text-left leading-tight">{v.label}</span>
             </button>
           ))}
         </div>
@@ -680,27 +788,61 @@ export function CrmMarketing() {
         </div>
       </div>
 
-      {/* Herramientas gratuitas */}
+      {/* Herramientas open source */}
       <div className="backdrop-blur-xl bg-card/60 border border-border/50 rounded-2xl p-5">
-        <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-          <Bot className="w-4 h-4 text-violet-400" />
-          Herramientas gratuitas recomendadas
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {FREE_TOOLS.map((tool) => (
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+            <Bot className="w-4 h-4 text-violet-400" />
+            Herramientas Open Source (GitHub)
+          </h3>
+          <span className="text-[10px] text-muted-foreground">12 repos · 100% gratis</span>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">
+          Las mejores herramientas open source para marketing digital con IA. Todas gratis, todas en GitHub.
+        </p>
+
+        {/* Filtros por categoría */}
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {TOOL_CATEGORIES.map((cat) => (
+            <span
+              key={cat}
+              className="text-[10px] px-2 py-0.5 rounded-full bg-muted/40 border border-border/40 text-muted-foreground"
+            >
+              {cat}
+            </span>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          {OPENSOURCE_TOOLS.map((tool) => (
             <a
               key={tool.name}
               href={tool.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 p-3 rounded-lg bg-card/40 border border-border/40 hover:border-violet-500/40 transition-all"
+              className={`group relative flex flex-col gap-2 p-3 rounded-xl border bg-gradient-to-br ${tool.color} hover:scale-[1.02] transition-all`}
             >
-              <span className="text-xl">{tool.icon}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground">{tool.name}</p>
-                <p className="text-[11px] text-muted-foreground">{tool.description}</p>
+              {/* Badge */}
+              {tool.badge && (
+                <span className="absolute top-2 right-2 text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-background/60 text-foreground/80 border border-border/30">
+                  {tool.badge}
+                </span>
+              )}
+
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{tool.icon}</span>
+                <div>
+                  <p className="text-xs font-bold text-foreground leading-tight">{tool.name}</p>
+                  <p className="text-[9px] text-muted-foreground">⭐ {tool.stars}</p>
+                </div>
               </div>
-              <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-1" />
+
+              <p className="text-[11px] text-foreground/80 leading-relaxed flex-1">{tool.description}</p>
+
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{tool.category}</span>
+                <ExternalLink className="w-3 h-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+              </div>
             </a>
           ))}
         </div>

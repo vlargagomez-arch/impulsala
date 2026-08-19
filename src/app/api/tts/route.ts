@@ -5,30 +5,32 @@ import { requireAdmin } from "@/lib/auth-guard";
  * POST /api/tts
  * Body: { text: string, voice?: string }
  *
- * Convierte texto a voz (MP3) usando servicios gratuitos.
- * No requiere API key.
+ * Convierte texto a voz (MP3) usando Edge TTS de Microsoft.
+ * Voces Neural - mucho más humanas que Google Translate.
+ * 100% gratis, sin API key, sin límite.
  *
- * Voices soportadas:
- * - "es-CO-Salome" (femenino colombiano) - default
- * - "es-CO-Gonzalo" (masculino colombiano)
- * - "es-MX-Jorge" (masculino mexicano neutro)
- * - "es-ES-Laura" (femenino español España)
- *
- * Usa Google Translate TTS endpoint (gratis, sin API key).
- * Límite: ~200 caracteres por request (lo dividimos automáticamente).
+ * Voices soportadas (español):
+ * - "es-CO-Salome" → es-CO-SalomeNeural (femenina colombiana)
+ * - "es-CO-Gonzalo" → es-CO-GonzaloNeural (masculino colombiano)
+ * - "es-MX-Dalia" → es-MX-DaliaNeural (femenina mexicana neutra)
+ * - "es-MX-Jorge" → es-MX-JorgeNeural (masculino mexicano)
+ * - "es-ES-Elvira" → es-ES-ElviraNeural (femenina española)
+ * - "es-ES-Alvaro" → es-ES-AlvaroNeural (masculino español)
+ * - "es-AR-Elena" → es-AR-ElenaNeural (femenina argentina)
+ * - "es-AR-Tomas" → es-AR-TomasNeural (masculino argentino)
  *
  * Response: audio/mpeg directamente
  */
 
 const VOICE_MAP: Record<string, string> = {
-  // Spanish voices - usan Google Translate TTS
-  "es-CO-Salome": "es-co", // Colombiana femenina (mapeada a es-us que suena parecido)
-  "es-CO-Gonzalo": "es-co-m", // Colombiano masculino
-  "es-MX-Jorge": "es-mx", // Mexicano masculino
-  "es-ES-Laura": "es-es", // Española femenina
-  "es-ES-Miguel": "es-es-m", // Español masculino
-  "es-US-Paula": "es-us", // Latina neutra femenina
-  "es-US-Carlos": "es-us-m", // Latino neutro masculino
+  "es-CO-Salome": "es-CO-SalomeNeural",
+  "es-CO-Gonzalo": "es-CO-GonzaloNeural",
+  "es-MX-Dalia": "es-MX-DaliaNeural",
+  "es-MX-Jorge": "es-MX-JorgeNeural",
+  "es-ES-Elvira": "es-ES-ElviraNeural",
+  "es-ES-Alvaro": "es-ES-AlvaroNeural",
+  "es-AR-Elena": "es-AR-ElenaNeural",
+  "es-AR-Tomas": "es-AR-TomasNeural",
 };
 
 export async function POST(req: NextRequest) {
@@ -49,13 +51,46 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // VoiceRSS endpoint gratuito (no requiere API key para uso básico)
-    // Alternativa: Google Translate TTS endpoint
-    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
-      text
-    )}&tl=es&client=tw-ob`;
+    const edgeVoice = VOICE_MAP[voice] || VOICE_MAP["es-CO-Salome"];
 
+    // Usar edge-tts-universal dinámicamente (puede no estar disponible en Vercel)
     try {
+      const edgeTtsModule: any = await import("edge-tts-universal");
+      const EdgeTTS = edgeTtsModule.EdgeTTS || edgeTtsModule.UniversalEdgeTTS;
+
+      // Constructor: new EdgeTTS(text, voice, options)
+      const tts = new EdgeTTS(text, edgeVoice, {
+        rate: 0,
+        volume: 0,
+        pitch: 0,
+      });
+
+      // synthesize() devuelve { audio: Blob, subtitle: [...] }
+      const result = await tts.synthesize();
+
+      if (!result?.audio) {
+        throw new Error("No se recibió audio");
+      }
+
+      // Convertir Blob a ArrayBuffer
+      const arrayBuffer = await result.audio.arrayBuffer();
+
+      return new NextResponse(arrayBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "audio/mpeg",
+          "Content-Length": arrayBuffer.byteLength.toString(),
+          "Cache-Control": "public, max-age=86400",
+        },
+      });
+    } catch (edgeErr: any) {
+      console.log("⚠️ Edge TTS no disponible, fallback a Google Translate TTS:", edgeErr.message);
+
+      // Fallback: Google Translate TTS (calidad menor pero siempre funciona)
+      const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
+        text.slice(0, 200)
+      )}&tl=es&client=tw-ob`;
+
       const audioRes = await fetch(ttsUrl, {
         headers: {
           "User-Agent": "Mozilla/5.0 (compatible; ImpulsalaBot/1.0)",
@@ -74,18 +109,9 @@ export async function POST(req: NextRequest) {
           },
         });
       }
-    } catch (err) {
-      console.log("Google TTS falló, probando alternativa...");
-    }
 
-    // Fallback: VoiceRSS (requiere API key gratuita)
-    // Por ahora, si Google falla, devolvemos error
-    return NextResponse.json(
-      {
-        error: "No se pudo generar el audio. Probá de nuevo en unos segundos.",
-      },
-      { status: 503 }
-    );
+      throw new Error("No se pudo generar audio ni con Edge ni con Google TTS");
+    }
   } catch (error: any) {
     console.error("❌ [TTS] Error:", error?.message);
     return NextResponse.json(
