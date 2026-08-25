@@ -20,16 +20,12 @@ const geistMono = Geist_Mono({
   preload: false,
 });
 
-// URL dinámica: lee de variables de entorno o usa la URL de deployment actual
-// En space-z.ai la URL real se pasa en headers x-forwarded-host / x-forwarded-proto
+// URL dinámica: lee de variables de entorno o usa la URL de Vercel
 function getSiteUrl(): string {
-  // 1. Variable de entorno explícita (prioridad)
   if (process.env.NEXT_PUBLIC_SITE_URL) {
     return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
   }
-  // 2. En build estático, usar un default razonable
-  //    (se sobreescribe en runtime con headers)
-  return "https://d1m686vag521-d.space-z.ai";
+  return "https://impulsala.vercel.app";
 }
 
 const SITE_URL = getSiteUrl();

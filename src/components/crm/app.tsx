@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Video,
   Target,
+  Rocket,
   Sparkles,
 } from "lucide-react";
 import { CrmDashboard } from "./dashboard";
@@ -26,8 +27,9 @@ import { CrmCampaigns } from "./campaigns";
 import { CrmBlog } from "./blog";
 import { CrmMarketing } from "./marketing";
 import { CrmProspeccion } from "./prospeccion";
+import { CrmGuiaMarketing } from "./guia-marketing";
 
-type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "marketing" | "prospeccion" | "blog";
+type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "marketing" | "guia" | "prospeccion" | "blog";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -65,6 +67,12 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string 
     label: "Marketing Digital",
     icon: <Sparkles className="w-4 h-4" />,
     description: "Guiones, voz IA y avatar. Todo integrado, todo gratis.",
+  },
+  {
+    id: "guia",
+    label: "Guía Maestra Marketing",
+    icon: <Rocket className="w-4 h-4" />,
+    description: "Plan paso a paso para ventas y viralidad. Tu experto en marketing.",
   },
   {
     id: "prospeccion",
@@ -218,6 +226,7 @@ export function CrmApp({ userEmail }: { userEmail: string }) {
           {tab === "newsletter" && <CrmNewsletter />}
           {tab === "campaigns" && <CrmCampaigns />}
           {tab === "marketing" && <CrmMarketing />}
+          {tab === "guia" && <CrmGuiaMarketing />}
           {tab === "prospeccion" && <CrmProspeccion />}
           {tab === "blog" && <CrmBlog />}
         </main>

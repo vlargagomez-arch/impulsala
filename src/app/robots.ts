@@ -1,14 +1,18 @@
 import { MetadataRoute } from "next";
 
-export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://w14nq5fjb3z1-d.space-z.ai";
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://impulsala.vercel.app";
 
+export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/private", "/tmp", "/api/"],
+        disallow: ["/crm", "/api/", "/private", "/tmp"],
+      },
+      {
+        userAgent: "Googlebot",
+        allow: "/",
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
