@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 4 service nodes in a circle, connected (represents the 4 services working together) -->
+
+  <!-- Connection lines (cross pattern - all services connected) -->
+  <line x1="60" y1="20" x2="60" y2="100" stroke="url(#grad)" stroke-width="3" opacity="0.4"/>
+  <line x1="20" y1="60" x2="100" y2="60" stroke="url(#grad)" stroke-width="3" opacity="0.4"/>
+  <line x1="32" y1="32" x2="88" y2="88" stroke="url(#grad)" stroke-width="3" opacity="0.4"/>
+  <line x1="88" y1="32" x2="32" y2="88" stroke="url(#grad)" stroke-width="3" opacity="0.4"/>
+
+  <!-- TOP node: Desarrollo Web (code brackets < >) -->
+  <circle cx="60" cy="20" r="14" fill="url(#grad)"/>
+  <path d="M 55 16 L 51 20 L 55 24 M 65 16 L 69 20 L 65 24"
+        fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- RIGHT node: SEO (magnifying glass) -->
+  <circle cx="100" cy="60" r="14" fill="url(#grad)"/>
+  <circle cx="98" cy="58" r="4" fill="none" stroke="white" stroke-width="2"/>
+  <line x1="101" y1="61" x2="104" y2="64" stroke="white" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- BOTTOM node: IA (spark/robot) -->
+  <circle cx="60" cy="100" r="14" fill="url(#grad)"/>
+  <circle cx="60" cy="100" r="4" fill="white"/>
+  <circle cx="60" cy="100" r="7" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- LEFT node: Marketing (megaphone/wave) -->
+  <circle cx="20" cy="60" r="14" fill="url(#grad)"/>
+  <path d="M 14 58 L 20 58 L 26 54 L 26 66 L 20 62 L 14 62 Z"
+        fill="white"/>
+  <path d="M 14 60 L 11 60 M 14 56 L 11 54 M 14 64 L 11 66"
+        stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Center dot (the client/business in the middle of everything) -->
+  <circle cx="60" cy="60" r="8" fill="url(#grad)"/>
+  <circle cx="60" cy="60" r="4" fill="white"/>
+</svg>

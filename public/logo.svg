@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 30 30" style="enable-background:new 0 0 30 30;" xml:space="preserve">
+<defs>
+  <linearGradient id="trackelaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+    <stop offset="50%" style="stop-color:#4f46e5;stop-opacity:1" />
+    <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
+  </linearGradient>
+  <linearGradient id="trackelaGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:1" />
+    <stop offset="100%" style="stop-color:#7dd3fc;stop-opacity:1" />
+  </linearGradient>
+</defs>
+
+<!-- Background rounded square with gradient -->
+<rect x="1" y="1" width="28" height="28" rx="7" fill="url(#trackelaGrad)"/>
+
+<!-- Trackela "T" symbol - modern, sleek -->
+<g>
+  <!-- Horizontal bar of T -->
+  <rect x="7" y="7" width="16" height="3.2" rx="1.6" fill="#ffffff"/>
+  
+  <!-- Vertical bar of T with tracking/connection elements -->
+  <rect x="13.4" y="7" width="3.2" height="16" rx="1.6" fill="#ffffff"/>
+  
+  <!-- Tracking dots (represents tracking/analytics) -->
+  <circle cx="9" cy="20" r="1.5" fill="#ffffff" opacity="0.9"/>
+  <circle cx="21" cy="20" r="1.5" fill="#ffffff" opacity="0.9"/>
+  
+  <!-- Connection lines (tracking flow) -->
+  <line x1="11" y1="20" x2="13" y2="16" stroke="#ffffff" stroke-width="0.8" opacity="0.5"/>
+  <line x1="19" y1="20" x2="17" y2="16" stroke="#ffffff" stroke-width="0.8" opacity="0.5"/>
+</g>
+</svg>

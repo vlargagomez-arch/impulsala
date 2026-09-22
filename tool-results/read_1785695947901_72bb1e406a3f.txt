@@ -1,0 +1,519 @@
+     1→import { NextRequest, NextResponse } from "next/server";
+     2→
+     3→/* ===== Types ===== */
+     4→interface SubMetric {
+     5→  name: string;
+     6→  value: string;
+     7→  status: "good" | "warning" | "critical";
+     8→}
+     9→
+    10→interface CategoryResult {
+    11→  label: string;
+    12→  score: number;
+    13→  status: "good" | "warning" | "critical";
+    14→  detail: string;
+    15→  recommendation: string;
+    16→  icon: string;
+    17→  subMetrics: SubMetric[];
+    18→}
+    19→
+    20→interface Issue {
+    21→  url: string;
+    22→  issue: string;
+    23→  severity: "high" | "medium" | "low";
+    24→  category: string;
+    25→}
+    26→
+    27→interface ActionItem {
+    28→  priority: number;
+    29→  action: string;
+    30→  impact: string;
+    31→  effort: string;
+    32→  category: string;
+    33→}
+    34→
+    35→interface SEOReport {
+    36→  url: string;
+    37→  domain: string;
+    38→  overallScore: number;
+    39→  grade: string;
+    40→  categories: CategoryResult[];
+    41→  issues: Issue[];
+    42→  actions: ActionItem[];
+    43→  technologies: { name: string; category: string }[];
+    44→  serverInfo: {
+    45→    statusCode: number;
+    46→    ssl: boolean;
+    47→    server: string;
+    48→    contentType: string;
+    49→    responseTime: number;
+    50→    contentLength: string;
+    51→  };
+    52→  pageContent: {
+    53→    title: string | null;
+    54→    metaDescription: string | null;
+    55→    h1Count: number;
+    56→    h1Text: string[];
+    57→    h2Count: number;
+    58→    h3Count: number;
+    59→    imgCount: number;
+    60→    imgWithAlt: number;
+    61→    linkCount: number;
+    62→    externalLinks: number;
+    63→    internalLinks: number;
+    64→    wordCount: number;
+    65→    hasViewport: boolean;
+    66→    hasCharset: boolean;
+    67→    hasOgTags: boolean;
+    68→    hasTwitterCards: boolean;
+    69→    hasCanonical: boolean;
+    70→    hasRobots: boolean;
+    71→    hasSchema: boolean;
+    72→    hasFavicon: boolean;
+    73→    hasLang: boolean;
+    74→  };
+    75→  summary: { good: number; warning: number; critical: number };
+    76→}
+    77→
+    78→function clamp(v: number) { return Math.round(Math.min(100, Math.max(0, v))); }
+    79→
+    80→/* ===== Technology Detection ===== */
+    81→function detectTech(html: string): { name: string; category: string }[] {
+    82→  const techs: { name: string; category: string }[] = [];
+    83→  const l = html.toLowerCase();
+    84→
+    85→  if (l.includes("__next") || l.includes("_next/static") || l.includes("next/router")) techs.push({ name: "Next.js", category: "frontend" });
+    86→  else if (l.includes("data-reactroot") || l.includes("__react") || l.includes("react.production") || l.includes("_react")) techs.push({ name: "React", category: "frontend" });
+    87→  if (l.includes("ng-version") || l.includes("ng-app") || l.includes("angular.io")) techs.push({ name: "Angular", category: "frontend" });
+    88→  if (l.includes("vue") && (l.includes("v-app") || l.includes("vuejs") || l.includes("v-cloak"))) techs.push({ name: "Vue.js", category: "frontend" });
+    89→  if (l.includes("svelte") && (l.includes("svelte-") || l.includes("sveltekit"))) techs.push({ name: "Svelte", category: "frontend" });
+    90→  if (l.includes("astro-island") || l.includes("astro-slot")) techs.push({ name: "Astro", category: "frontend" });
+    91→  if (l.includes("nuxt") || l.includes("__nuxt")) techs.push({ name: "Nuxt.js", category: "frontend" });
+    92→  if (l.includes("gatsby") || l.includes("gatsby-")) techs.push({ name: "Gatsby", category: "frontend" });
+    93→  if (l.includes("tailwind") || l.includes("tailwindcss")) techs.push({ name: "Tailwind CSS", category: "frontend" });
+    94→  if (l.includes("bootstrap") || l.includes("bootstrap.min.css")) techs.push({ name: "Bootstrap", category: "frontend" });
+    95→  if (l.includes("jquery") || l.includes("jquery.min.js")) techs.push({ name: "jQuery", category: "frontend" });
+    96→
+    97→  if (l.includes("wp-content") || l.includes("wp-includes") || l.includes("wordpress")) techs.push({ name: "WordPress", category: "cms" });
+    98→  if (l.includes("shopify") || l.includes("shopify.com")) techs.push({ name: "Shopify", category: "cms" });
+    99→  if (l.includes("contentful") || l.includes("contentful.com")) techs.push({ name: "Contentful", category: "cms" });
+   100→  if (l.includes("sanity") || l.includes("sanity.io")) techs.push({ name: "Sanity", category: "cms" });
+   101→  if (l.includes("strapi") || l.includes("strapi.io")) techs.push({ name: "Strapi", category: "cms" });
+   102→  if (l.includes("webflow") || l.includes("data-wf-page")) techs.push({ name: "Webflow", category: "cms" });
+   103→  if (l.includes("wix") || l.includes("wix.com") || l.includes("wix-")) techs.push({ name: "Wix", category: "cms" });
+   104→
+   105→  if (l.includes("google-analytics") || l.includes("gtag(") || l.includes("googletagmanager") || l.includes("ga('create'")) techs.push({ name: "Google Analytics", category: "analytics" });
+   106→  if (l.includes("gtm.js") || l.includes("googletagmanager.com/gtm.js")) techs.push({ name: "Google Tag Manager", category: "analytics" });
+   107→  if (l.includes("facebook_pixel") || l.includes("fbq(") || l.includes("fbevents.js")) techs.push({ name: "Meta Pixel", category: "analytics" });
+   108→  if (l.includes("hotjar") || l.includes("hj")) techs.push({ name: "Hotjar", category: "analytics" });
+   109→  if (l.includes("clarity.ms") || l.includes("microsoft/clarity")) techs.push({ name: "Microsoft Clarity", category: "analytics" });
+   110→  if (l.includes("plausible") || l.includes("plausible.io")) techs.push({ name: "Plausible", category: "analytics" });
+   111→
+   112→  if (l.includes("vercel") || l.includes("vercel-insights")) techs.push({ name: "Vercel", category: "hosting" });
+   113→  if (l.includes("cloudflare") || l.includes("cf-browser-verification")) techs.push({ name: "Cloudflare", category: "hosting" });
+   114→  if (l.includes("netlify") || l.includes("netlify-identity")) techs.push({ name: "Netlify", category: "hosting" });
+   115→  if (l.includes("firebase") || l.includes("firebaseapp.com")) techs.push({ name: "Firebase", category: "hosting" });
+   116→
+   117→  if (l.includes("recaptcha") || l.includes("g-recaptcha")) techs.push({ name: "reCAPTCHA", category: "security" });
+   118→
+   119→  return techs;
+   120→}
+   121→
+   122→/* ===== Parse HTML ===== */
+   123→function parseHTML(html: string) {
+   124→  const c: SEOReport["pageContent"] = {
+   125→    title: null, metaDescription: null,
+   126→    h1Count: 0, h1Text: [], h2Count: 0, h3Count: 0,
+   127→    imgCount: 0, imgWithAlt: 0,
+   128→    linkCount: 0, externalLinks: 0, internalLinks: 0,
+   129→    wordCount: 0, hasViewport: false, hasCharset: false,
+   130→    hasOgTags: false, hasTwitterCards: false,
+   131→    hasCanonical: false, hasRobots: false, hasSchema: false,
+   132→    hasFavicon: false, hasLang: false,
+   133→  };
+   134→
+   135→  const tm = html.match(/<title[^>]*>(.*?)<\/title>/i);
+   136→  if (tm) c.title = tm[1].trim();
+   137→
+   138→  const dm = html.match(/<meta[^>]+name\s*=\s*["']description["'][^>]+content\s*=\s*["'](.*?)["']/i)
+   139→    || html.match(/<meta[^>]+content\s*=\s*["'](.*?)["'][^>]+name\s*=\s*["']description["']/i);
+   140→  if (dm) c.metaDescription = dm[1].trim();
+   141→
+   142→  c.hasViewport = /<meta[^>]+name\s*=\s*["']viewport["']/i.test(html);
+   143→  c.hasCharset = /<meta[^>]+charset/i.test(html);
+   144→  c.hasLang = /<html[^>]+lang\s*=/i.test(html);
+   145→  c.hasFavicon = /<link[^>]+rel\s*=\s*["'](?:icon|shortcut icon)["']/i.test(html) || /rel\s*=\s*["'](?:icon|shortcut icon)["'][^>]+href/i.test(html);
+   146→  c.hasCanonical = /<link[^>]+rel\s*=\s*["']canonical["']/i.test(html) || /rel\s*=\s*["']canonical["'][^>]+href/i.test(html);
+   147→  c.hasOgTags = /property\s*=\s*["']og:/i.test(html);
+   148→  c.hasTwitterCards = /name\s*=\s*["']twitter:/i.test(html);
+   149→  c.hasRobots = /name\s*=\s*["']robots["']/i.test(html);
+   150→  c.hasSchema = /application\/ld\+json/i.test(html);
+   151→
+   152→  const h1m = html.match(/<h1[^>]*>(.*?)<\/h1>/gi) || [];
+   153→  c.h1Count = h1m.length;
+   154→  c.h1Text = h1m.map(h => h.replace(/<[^>]*>/g, "").trim()).slice(0, 3);
+   155→  c.h2Count = (html.match(/<h2[^>]*>/gi) || []).length;
+   156→  c.h3Count = (html.match(/<h3[^>]*>/gi) || []).length;
+   157→
+   158→  const imgs = html.match(/<img[^>]*>/gi) || [];
+   159→  c.imgCount = imgs.length;
+   160→  c.imgWithAlt = imgs.filter(img => /alt\s*=\s*["'][^"']+["']/i.test(img)).length;
+   161→
+   162→  const links = html.match(/<a[^>]+href\s*=\s*["']([^"']+)["']/gi) || [];
+   163→  c.linkCount = links.length;
+   164→  c.internalLinks = links.filter(l => /^\//.test(l) || !/^https?:\/\//i.test(l)).length;
+   165→  c.externalLinks = links.length - c.internalLinks;
+   166→
+   167→  const text = html
+   168→    .replace(/<script[\s\S]*?<\/script>/gi, "")
+   169→    .replace(/<style[\s\S]*?<\/style>/gi, "")
+   170→    .replace(/<[^>]+>/g, " ")
+   171→    .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+   172→    .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+   173→    .replace(/\s+/g, " ").trim();
+   174→  c.wordCount = text ? text.split(/\s+/).filter(w => w.length > 1).length : 0;
+   175→
+   176→  return c;
+   177→}
+   178→
+   179→/* ===== Build Report ===== */
+   180→function buildReport(url: string, html: string, statusCode: number, responseTime: number, headers: Headers): SEOReport {
+   181→  const p = parseHTML(html);
+   182→  const techs = detectTech(html);
+   183→  const domain = (() => { try { return new URL(url).hostname; } catch { return url; } })();
+   184→
+   185→  const issues: Issue[] = [];
+   186→  const actions: ActionItem[] = [];
+   187→
+   188→  // ===== SEO ON-PAGE =====
+   189→  let seoScore = 100;
+   190→  const seoSubs: SubMetric[] = [];
+   191→
+   192→  if (p.title) {
+   193→    const tl = p.title.length;
+   194→    seoSubs.push({ name: "Title Tag", value: `"${p.title.length > 60 ? p.title.substring(0, 60) + "..." : p.title}" (${tl} car.)`, status: (tl >= 30 && tl <= 60) ? "good" : "warning" });
+   195→    if (tl < 30 || tl > 60) { seoScore -= 5; issues.push({ url, issue: `Title tag ${tl < 30 ? "muy corto" : "demasiado largo"} (${tl} car., ideal: 30-60)`, severity: "medium", category: "SEO" }); }
+   196→  } else {
+   197→    seoSubs.push({ name: "Title Tag", value: "No encontrado", status: "critical" });
+   198→    seoScore -= 20;
+   199→    issues.push({ url, issue: "Sin title tag — esencial para SEO", severity: "high", category: "SEO" });
+   200→    actions.push({ priority: 1, action: "Agregar title tag descriptivo (30-60 caracteres)", impact: "Alta (+15-20 pts)", effort: "Bajo", category: "SEO" });
+   201→  }
+   202→
+   203→  if (p.metaDescription) {
+   204→    const dl = p.metaDescription.length;
+   205→    seoSubs.push({ name: "Meta Description", value: `"${p.metaDescription.substring(0, 80)}..." (${dl} car.)`, status: (dl >= 120 && dl <= 160) ? "good" : "warning" });
+   206→    if (dl < 120 || dl > 160) { seoScore -= 5; issues.push({ url, issue: `Meta description ${dl < 120 ? "corta" : "larga"} (${dl} car., ideal: 120-160)`, severity: "low", category: "SEO" }); }
+   207→  } else {
+   208→    seoSubs.push({ name: "Meta Description", value: "No encontrada", status: "critical" });
+   209→    seoScore -= 15;
+   210→    issues.push({ url, issue: "Sin meta description", severity: "high", category: "SEO" });
+   211→    actions.push({ priority: 2, action: "Agregar meta description única (120-160 caracteres)", impact: "Alta (+10-15 pts)", effort: "Medio", category: "SEO" });
+   212→  }
+   213→
+   214→  if (p.h1Count === 1) {
+   215→    seoSubs.push({ name: "H1 Tag", value: `"${(p.h1Text[0] || "").substring(0, 50)}"`, status: "good" });
+   216→  } else if (p.h1Count > 1) {
+   217→    seoSubs.push({ name: "H1 Tags", value: `${p.h1Count} encontrados (debe ser 1)`, status: "warning" });
+   218→    seoScore -= 8; issues.push({ url, issue: `Multiples H1 (${p.h1Count})`, severity: "medium", category: "SEO" });
+   219→    actions.push({ priority: 3, action: "Corregir: un solo H1 por pagina", impact: "Media (+8 pts)", effort: "Bajo", category: "SEO" });
+   220→  } else {
+   221→    seoSubs.push({ name: "H1 Tag", value: "No encontrado", status: "critical" });
+   222→    seoScore -= 15; issues.push({ url, issue: "Sin etiqueta H1", severity: "high", category: "SEO" });
+   223→    actions.push({ priority: 3, action: "Agregar H1 con palabra clave principal", impact: "Alta (+15 pts)", effort: "Bajo", category: "SEO" });
+   224→  }
+   225→
+   226→  seoSubs.push({ name: "Estructura H2-H3", value: `${p.h2Count} H2, ${p.h3Count} H3`, status: (p.h2Count >= 2) ? "good" : p.h2Count >= 1 ? "warning" : "warning" });
+   227→  if (p.h2Count === 0) { seoScore -= 5; issues.push({ url, issue: "Sin H2 para estructurar contenido", severity: "medium", category: "SEO" }); }
+   228→
+   229→  if (p.imgCount > 0) {
+   230→    const pct = Math.round((p.imgWithAlt / p.imgCount) * 100);
+   231→    seoSubs.push({ name: "Alt en Imagenes", value: `${p.imgWithAlt}/${p.imgCount} con alt (${pct}%)`, status: pct >= 90 ? "good" : pct >= 50 ? "warning" : "critical" });
+   232→    if (pct < 90) { seoScore -= pct >= 50 ? 5 : 10; issues.push({ url, issue: `${p.imgCount - p.imgWithAlt} imagenes sin alt`, severity: pct >= 50 ? "medium" : "high", category: "Accesibilidad" }); }
+   233→  } else {
+   234→    seoSubs.push({ name: "Imagenes", value: "No encontradas", status: "good" });
+   235→  }
+   236→
+   237→  seoSubs.push({ name: "Contenido", value: `~${p.wordCount} palabras`, status: p.wordCount >= 300 ? "good" : p.wordCount >= 100 ? "warning" : "critical" });
+   238→  if (p.wordCount < 300) { seoScore -= p.wordCount >= 100 ? 8 : 15; if (p.wordCount < 100) issues.push({ url, issue: `Contenido muy escaso: ${p.wordCount} palabras`, severity: "high", category: "SEO" }); }
+   239→
+   240→  seoSubs.push({ name: "Canonical", value: p.hasCanonical ? "Presente" : "Ausente", status: p.hasCanonical ? "good" : "warning" });
+   241→  if (!p.hasCanonical) { seoScore -= 3; issues.push({ url, issue: "Sin canonical tag", severity: "low", category: "SEO" }); }
+   242→
+   243→  seoSubs.push({ name: "Schema/JSON-LD", value: p.hasSchema ? "Detectado" : "No detectado", status: p.hasSchema ? "good" : "warning" });
+   244→  if (!p.hasSchema) { seoScore -= 5; issues.push({ url, issue: "Sin Schema markup", severity: "medium", category: "SEO" }); actions.push({ priority: 6, action: "Implementar Schema markup (Organization, FAQ, etc.)", impact: "Media (+5-10 pts)", effort: "Medio", category: "SEO" }); }
+   245→
+   246→  seoSubs.push({ name: "Open Graph", value: p.hasOgTags ? "Presente" : "Ausente", status: p.hasOgTags ? "good" : "warning" });
+   247→  if (!p.hasOgTags) { seoScore -= 3; issues.push({ url, issue: "Sin Open Graph tags", severity: "low", category: "Redes Sociales" }); }
+   248→
+   249→  seoSubs.push({ name: "Twitter Cards", value: p.hasTwitterCards ? "Presente" : "Ausente", status: p.hasTwitterCards ? "good" : "warning" });
+   250→
+   251→  seoScore = clamp(seoScore);
+   252→
+   253→  // ===== MOBILE/UX =====
+   254→  let mobScore = 100;
+   255→  const mobSubs: SubMetric[] = [];
+   256→
+   257→  mobSubs.push({ name: "Viewport", value: p.hasViewport ? "Configurado" : "No configurado", status: p.hasViewport ? "good" : "critical" });
+   258→  if (!p.hasViewport) { mobScore -= 30; issues.push({ url, issue: "Sin viewport meta — no responsive", severity: "high", category: "Movil" }); actions.push({ priority: 0, action: 'Agregar <meta name="viewport" content="width=device-width, initial-scale=1">', impact: "Critica (+30 pts)", effort: "Bajo", category: "Movil" }); }
+   259→
+   260→  mobSubs.push({ name: "Atributo lang", value: p.hasLang ? "Definido" : "No definido", status: p.hasLang ? "good" : "warning" });
+   261→  if (!p.hasLang) { mobScore -= 5; }
+   262→
+   263→  mobSubs.push({ name: "Favicon", value: p.hasFavicon ? "Presente" : "No encontrado", status: p.hasFavicon ? "good" : "warning" });
+   264→  if (!p.hasFavicon) { mobScore -= 3; }
+   265→
+   266→  const mq = (html.match(/@media/gi) || []).length;
+   267→  mobSubs.push({ name: "Media Queries", value: `${mq} bloques responsive`, status: mq >= 3 ? "good" : mq >= 1 ? "warning" : "critical" });
+   268→  if (mq < 3) { mobScore -= mq >= 1 ? 5 : 15; if (mq === 0) issues.push({ url, issue: "Sin media queries — posible no responsive", severity: "high", category: "Movil" }); }
+   269→
+   270→  mobSubs.push({ name: "Charset", value: p.hasCharset ? "Definido" : "No definido", status: p.hasCharset ? "good" : "warning" });
+   271→  if (!p.hasCharset) { mobScore -= 5; }
+   272→
+   273→  mobScore = clamp(mobScore);
+   274→
+   275→  // ===== SECURITY =====
+   276→  const isHttps = url.startsWith("https://");
+   277→  const srv = headers.get("server") || "Desconocido";
+   278→  const hsts = (headers.get("strict-transport-security") || "").length > 0;
+   279→  const csp = (headers.get("content-security-policy") || "").length > 0;
+   280→  const xframe = (headers.get("x-frame-options") || "").length > 0 || (headers.get("content-security-policy") || "").includes("frame-ancestors");
+   281→  const xct = (headers.get("x-content-type-options") || "").length > 0;
+   282→
+   283→  let secScore = 100;
+   284→  const secSubs: SubMetric[] = [];
+   285→
+   286→  secSubs.push({ name: "SSL/HTTPS", value: isHttps ? "Conexion segura" : "HTTP inseguro", status: isHttps ? "good" : "critical" });
+   287→  if (!isHttps) { secScore -= 30; issues.push({ url, issue: "No usa HTTPS", severity: "high", category: "Seguridad" }); actions.push({ priority: 0, action: "Migrar a HTTPS con certificado SSL", impact: "Critica (+30 pts)", effort: "Medio", category: "Seguridad" }); }
+   288→
+   289→  secSubs.push({ name: "HSTS", value: hsts ? "Activo" : "No configurado", status: hsts ? "good" : "warning" });
+   290→  if (!hsts) { secScore -= 8; issues.push({ url, issue: "HSTS no configurado", severity: "medium", category: "Seguridad" }); }
+   291→
+   292→  secSubs.push({ name: "CSP", value: csp ? "Configurado" : "No configurado", status: csp ? "good" : "warning" });
+   293→  if (!csp) { secScore -= 8; issues.push({ url, issue: "Sin Content Security Policy", severity: "medium", category: "Seguridad" }); }
+   294→
+   295→  secSubs.push({ name: "X-Frame-Options", value: xframe ? "Protegido" : "No configurado", status: xframe ? "good" : "warning" });
+   296→  if (!xframe) { secScore -= 5; }
+   297→
+   298→  secSubs.push({ name: "X-Content-Type", value: xct ? "Configurado" : "No configurado", status: xct ? "good" : "warning" });
+   299→  if (!xct) { secScore -= 3; }
+   300→
+   301→  secSubs.push({ name: "Servidor", value: srv, status: "good" });
+   302→
+   303→  secScore = clamp(secScore);
+   304→
+   305→  // ===== PERFORMANCE =====
+   306→  const htmlKB = Math.round(html.length / 1024);
+   307→  const scripts = (html.match(/<script/gi) || []).length;
+   308→  const styles = (html.match(/<link[^>]+stylesheet/gi) || []).length + (html.match(/<style/gi) || []).length;
+   309→  const inlineStyles = (html.match(/style\s*=/gi) || []).length;
+   310→
+   311→  let perfScore = 100;
+   312→  const perfSubs: SubMetric[] = [];
+   313→
+   314→  perfSubs.push({ name: "Tamano HTML", value: `${htmlKB} KB`, status: htmlKB <= 100 ? "good" : htmlKB <= 500 ? "warning" : "critical" });
+   315→  if (htmlKB > 500) { perfScore -= 20; issues.push({ url, issue: `HTML pesado (${htmlKB} KB)`, severity: "medium", category: "Rendimiento" }); }
+   316→  else if (htmlKB > 100) { perfScore -= 10; }
+   317→
+   318→  perfSubs.push({ name: "Scripts", value: `${scripts} bloques`, status: scripts <= 5 ? "good" : scripts <= 15 ? "warning" : "critical" });
+   319→  if (scripts > 15) { perfScore -= 10; issues.push({ url, issue: `${scripts} bloques de script`, severity: "medium", category: "Rendimiento" }); }
+   320→  else if (scripts > 5) { perfScore -= 3; }
+   321→
+   322→  perfSubs.push({ name: "CSS", value: `${styles} hojas`, status: styles <= 3 ? "good" : styles <= 8 ? "warning" : "critical" });
+   323→  if (styles > 8) { perfScore -= 8; }
+   324→
+   325→  perfSubs.push({ name: "Estilos Inline", value: `${inlineStyles}`, status: inlineStyles <= 10 ? "good" : inlineStyles <= 30 ? "warning" : "critical" });
+   326→  if (inlineStyles > 30) { perfScore -= 5; }
+   327→
+   328→  perfSubs.push({ name: "Tiempo Respuesta", value: `${responseTime}ms`, status: responseTime <= 500 ? "good" : responseTime <= 2000 ? "warning" : "critical" });
+   329→  if (responseTime > 2000) { perfScore -= 15; issues.push({ url, issue: `Respuesta lenta (${responseTime}ms)`, severity: "high", category: "Rendimiento" }); }
+   330→  else if (responseTime > 500) { perfScore -= 5; }
+   331→
+   332→  perfSubs.push({ name: "Enlaces", value: `${p.linkCount} (${p.internalLinks} internos, ${p.externalLinks} externos)`, status: "good" });
+   333→
+   334→  perfScore = clamp(perfScore);
+   335→
+   336→  // ===== CONTENT =====
+   337→  let contScore = 100;
+   338→  const contSubs: SubMetric[] = [];
+   339→
+   340→  contSubs.push({ name: "Palabras", value: `~${p.wordCount}`, status: p.wordCount >= 300 ? "good" : p.wordCount >= 100 ? "warning" : "critical" });
+   341→  if (p.wordCount < 300) { contScore -= p.wordCount >= 100 ? 15 : 25; }
+   342→
+   343→  contSubs.push({ name: "Enlaces Internos", value: `${p.internalLinks}`, status: p.internalLinks >= 3 ? "good" : p.internalLinks >= 1 ? "warning" : "critical" });
+   344→  if (p.internalLinks === 0) { contScore -= 10; issues.push({ url, issue: "Sin enlaces internos", severity: "medium", category: "SEO" }); }
+   345→
+   346→  contSubs.push({ name: "Enlaces Externos", value: `${p.externalLinks}`, status: p.externalLinks >= 1 ? "good" : "warning" });
+   347→  if (p.externalLinks === 0) { contScore -= 3; }
+   348→
+   349→  const ht = p.h1Count + p.h2Count + p.h3Count;
+   350→  contSubs.push({ name: "Jerarquia Headings", value: `H1:${p.h1Count} H2:${p.h2Count} H3:${p.h3Count}`, status: ht >= 3 ? "good" : "warning" });
+   351→  if (ht < 3) { contScore -= 5; }
+   352→
+   353→  contSubs.push({ name: "Imagenes", value: `${p.imgCount}`, status: "good" });
+   354→  contSubs.push({ name: "Meta Robots", value: p.hasRobots ? "Definido" : "Por defecto (index)", status: "good" });
+   355→
+   356→  contScore = clamp(contScore);
+   357→
+   358→  // ===== TECH/ANALYTICS =====
+   359→  let techScore = 80;
+   360→  const techSubs: SubMetric[] = [];
+   361→
+   362→  techSubs.push({ name: "Tecnologias", value: `${techs.length} detectadas: ${techs.map(t => t.name).join(", ") || "Ninguna clara"}`, status: techs.length > 0 ? "good" : "warning" });
+   363→
+   364→  const hasAnalytics = techs.some(t => t.category === "analytics");
+   365→  if (hasAnalytics) {
+   366→    techSubs.push({ name: "Analytics", value: techs.filter(t => t.category === "analytics").map(t => t.name).join(", "), status: "good" });
+   367→  } else {
+   368→    techSubs.push({ name: "Analytics", value: "No detectado", status: "critical" });
+   369→    techScore -= 20;
+   370→    issues.push({ url, issue: "Sin Google Analytics ni tracking", severity: "high", category: "Analytics" });
+   371→    actions.push({ priority: 8, action: "Instalar Google Analytics 4 o Tag Manager", impact: "Critica (no puedes medir)", effort: "Bajo", category: "Analytics" });
+   372→  }
+   373→
+   374→  techSubs.push({ name: "CMS/Framework", value: techs.find(t => t.category === "cms")?.name || techs.find(t => t.category === "frontend")?.name || "Desarrollo custom", status: "good" });
+   375→  techSubs.push({ name: "Hosting", value: techs.find(t => t.category === "hosting")?.name || "No identificado", status: "good" });
+   376→
+   377→  techScore = clamp(techScore);
+   378→
+   379→  // ===== COMBINE =====
+   380→  const categories: CategoryResult[] = [
+   381→    {
+   382→      label: "SEO On-Page", score: seoScore,
+   383→      status: seoScore >= 75 ? "good" : seoScore >= 50 ? "warning" : "critical",
+   384→      detail: seoScore >= 75 ? `SEO tecnico solido. Title y meta description correctos. Estructura de headings OK.` : seoScore >= 50 ? `SEO aceptable con mejoras necesarias.` : `SEO deficiente. Faltan elementos fundamentales.`,
+   385→      recommendation: seoScore >= 75 ? "Enfocarse en contenido de calidad y link building." : "Corregir elementos criticos (title, meta, H1) primero.",
+   386→      icon: "FileSearch", subMetrics: seoSubs,
+   387→    },
+   388→    {
+   389→      label: "Experiencia Movil", score: mobScore,
+   390→      status: mobScore >= 75 ? "good" : mobScore >= 50 ? "warning" : "critical",
+   391→      detail: mobScore >= 75 ? "Pagina preparada para moviles con viewport y responsive." : "Algunos elementos moviles necesitan atencion.",
+   392→      recommendation: mobScore >= 75 ? "Monitorear Core Web Vitals mobile." : "Agregar viewport meta y mejorar media queries.",
+   393→      icon: "Smartphone", subMetrics: mobSubs,
+   394→    },
+   395→    {
+   396→      label: "Seguridad", score: secScore,
+   397→      status: secScore >= 75 ? "good" : secScore >= 50 ? "warning" : "critical",
+   398→      detail: secScore >= 75 ? "Buenas practicas de seguridad." : "Faltan headers de seguridad importantes.",
+   399→      recommendation: secScore >= 75 ? "Mantener certificados y headers actualizados." : "Implementar HSTS, CSP y X-Frame-Options.",
+   400→      icon: "Shield", subMetrics: secSubs,
+   401→    },
+   402→    {
+   403→      label: "Rendimiento", score: perfScore,
+   404→      status: perfScore >= 75 ? "good" : perfScore >= 50 ? "warning" : "critical",
+   405→      detail: perfScore >= 75 ? `HTML ligero (${htmlKB}KB) y respuesta rapida (${responseTime}ms).` : "Rendimiento con margen de mejora.",
+   406→      recommendation: perfScore >= 75 ? "Considerar prefetch y service worker." : "Minificar HTML/CSS/JS, reducir scripts, implementar CDN.",
+   407→      icon: "Gauge", subMetrics: perfSubs,
+   408→    },
+   409→    {
+   410→      label: "Contenido y Estructura", score: contScore,
+   411→      status: contScore >= 75 ? "good" : contScore >= 50 ? "warning" : "critical",
+   412→      detail: contScore >= 75 ? "Buen contenido y estructura de enlaces." : "Contenido necesita mejora.",
+   413→      recommendation: contScore >= 75 ? "Agregar enlaces internos estrategicos." : "Expandir contenido, mejorar headings y enlaces internos.",
+   414→      icon: "FileCode", subMetrics: contSubs,
+   415→    },
+   416→    {
+   417→      label: "Tecnologias y Tracking", score: techScore,
+   418→      status: techScore >= 75 ? "good" : techScore >= 50 ? "warning" : "critical",
+   419→      detail: techs.length > 0 ? `Detectadas: ${techs.map(t => t.name).join(", ")}.` : "No se detectaron tecnologias claramente.",
+   420→      recommendation: techScore >= 75 ? "Stack adecuado. Asegurar que analytics este configurado." : "Instalar al menos un sistema de analytics.",
+   421→      icon: "Wifi", subMetrics: techSubs,
+   422→    },
+   423→  ];
+   424→
+   425→  const overall = Math.round(categories.reduce((s, c) => s + c.score, 0) / categories.length);
+   426→  const grade = overall >= 85 ? "A" : overall >= 70 ? "B" : overall >= 55 ? "C" : overall >= 40 ? "D" : "F";
+   427→
+   428→  issues.sort((a, b) => { const o = { high: 0, medium: 1, low: 2 }; return o[a.severity] - o[b.severity]; });
+   429→  actions.sort((a, b) => a.priority - b.priority);
+   430→
+   431→  return {
+   432→    url, domain, overallScore: overall, grade,
+   433→    categories, issues, actions, technologies: techs,
+   434→    serverInfo: { statusCode, ssl: isHttps, server: srv, contentType: headers.get("content-type") || "Desconocido", responseTime, contentLength: headers.get("content-length") ? `${Math.round(parseInt(headers.get("content-length")!) / 1024)} KB` : `${htmlKB} KB` },
+   435→    pageContent: p,
+   436→    summary: { good: categories.filter(c => c.status === "good").length, warning: categories.filter(c => c.status === "warning").length, critical: categories.filter(c => c.status === "critical").length },
+   437→  };
+   438→}
+   439→
+   440→/* ===== API ===== */
+   441→export async function POST(request: NextRequest) {
+   442→  try {
+   443→    const body = await request.json();
+   444→    let { url } = body;
+   445→
+   446→    if (!url || typeof url !== "string") {
+   447→      return NextResponse.json({ error: "URL es requerida" }, { status: 400 });
+   448→    }
+   449→
+   450→    url = url.trim();
+   451→    if (!url.startsWith("http://") && !url.startsWith("https://")) url = "https://" + url;
+   452→
+   453→    try { new URL(url); } catch { return NextResponse.json({ error: "URL invalida" }, { status: 400 }); }
+   454→
+   455→    const t0 = Date.now();
+   456→    const ctrl = new AbortController();
+   457→    const timer = setTimeout(() => ctrl.abort(), 15000);
+   458→
+   459→    let resp: Response;
+   460→    let html = "";
+   461→    let statusCode = 0;
+   462→    let rt = 0;
+   463→
+   464→    try {
+   465→      resp = await fetch(url, {
+   466→        signal: ctrl.signal,
+   467→        headers: {
+   468→          "User-Agent": "Mozilla/5.0 (compatible; NexusDigital-SEO-Bot/1.0)",
+   469→          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+   470→          "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+   471→        },
+   472→        redirect: "follow",
+   473→      });
+   474→      rt = Date.now() - t0;
+   475→      statusCode = resp.status;
+   476→      html = await resp.text();
+   477→    } catch (e: unknown) {
+   478→      clearTimeout(timer);
+   479→      const msg = e instanceof DOMException && e.name === "AbortError"
+   480→        ? "La pagina tardo demasiado en responder (timeout 15s)"
+   481→        : `No se pudo acceder: ${e instanceof Error ? e.message : "Error"}`;
+   482→      return NextResponse.json({ error: msg }, { status: 422 });
+   483→    }
+   484→    clearTimeout(timer);
+   485→
+   486→    if (statusCode !== 200) {
+   487→      return NextResponse.json({ error: `La pagina respondio con codigo ${statusCode}. No se puede analizar una pagina que no existe o esta caida.` }, { status: 422 });
+   488→    }
+   489→
+   490→    if (!html || html.length < 50) {
+   491→      return NextResponse.json({ error: "La pagina no contiene HTML suficiente para analizar." }, { status: 422 });
+   492→    }
+   493→
+   494→    // Check if it's a parked domain / placeholder page (not a real website)
+   495→    const htmlLower = html.toLowerCase();
+   496→    const parkedIndicators = [
+   497→      "this domain is for sale", "buy this domain", "domain parking", "parked domain",
+   498→      "this domain is available", "purchase this domain", "register this domain",
+   499→      "dominio en venta", "comprar este dominio", "este dominio esta a la venta",
+   500→      "this page is parked", "coming soon", "under construction", "site not found",
+   501→      "error 404", "page not found", "no such site", "webnode", "sedoparking",
+   502→      "dan.com", "aftermarket", "undeliverable", "namecheap parking",
+   503→    ];
+   504→    const isParked = parkedIndicators.some(ind => htmlLower.includes(ind));
+   505→    const hasNoRealContent = !htmlLower.includes("<html") && !htmlLower.includes("<!doctype");
+   506→    if (isParked || hasNoRealContent) {
+   507→      return NextResponse.json({ error: "Este dominio no tiene una pagina web real (esta en venta, parqueado o no existe). Solo analizamos sitios web activos." }, { status: 422 });
+   508→    }
+   509→
+   510→    if (html.length > 500000) html = html.substring(0, 500000);
+   511→
+   512→    const report = buildReport(url, html, statusCode, rt, resp.headers);
+   513→    return NextResponse.json({ success: true, report });
+   514→  } catch (error) {
+   515→    console.error("SEO Analysis Error:", error);
+   516→    return NextResponse.json({ error: "Error interno al analizar" }, { status: 500 });
+   517→  }
+   518→}
+   519→

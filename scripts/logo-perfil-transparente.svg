@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logo Impulsala para foto de perfil - versión transparente (sin fondo) -->
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#d946ef"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Llave izquierda { -->
+  <path d="M 179 77
+           C 120 77 111 119 111 162
+           L 111 222
+           C 111 247 86 256 51 256
+           C 86 256 111 264 111 290
+           L 111 350
+           C 111 393 120 435 179 435"
+        fill="none"
+        stroke="url(#brandGrad)"
+        stroke-width="38"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Punto de la i -->
+  <circle cx="256" cy="137" r="38" fill="url(#brandGrad)"/>
+
+  <!-- Barra vertical de la i -->
+  <rect x="222" y="205" width="68" height="188" rx="34" fill="url(#brandGrad)"/>
+
+  <!-- Llave derecha } -->
+  <path d="M 333 77
+           C 392 77 401 119 401 162
+           L 401 222
+           C 401 247 426 256 461 256
+           C 426 256 401 264 401 290
+           L 401 350
+           C 401 393 392 435 333 435"
+        fill="none"
+        stroke="url(#brandGrad)"
+        stroke-width="38"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+</svg>
