@@ -27,6 +27,9 @@ type Prospect = {
   potentialScore: number;
   subject: string;
   proposal: string;
+  address: string | null;
+  osmUrl: string;
+  mapUrl: string;
   sourceUrl: string;
   sourceDomain: string;
 };
@@ -64,6 +67,7 @@ export function CrmProspeccion() {
   const [errorType, setErrorType] = useState<string | null>(null);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const [meta, setMeta] = useState<{ provider: string; city: string; scanned: number } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,6 +93,11 @@ export function CrmProspeccion() {
       }
 
       setProspects(data.prospects || []);
+      setMeta(
+        data.prospects?.length
+          ? { provider: data.provider || "openstreetmap", city: data.city || location, scanned: data.scanned || 0 }
+          : null,
+      );
 
       if (data.message) {
         setError(data.message);
@@ -130,7 +139,7 @@ export function CrmProspeccion() {
           <div>
             <h2 className="text-lg font-bold text-foreground">Prospección con IA</h2>
             <p className="text-xs text-muted-foreground">
-              Buscá negocios en Google, extraé sus contactos y generá propuestas personalizadas con IA.
+              Buscá negocios REALES en el mapa (OpenStreetMap) con sus datos de contacto y generá propuestas personalizadas con IA. Nada inventado: si un negocio no está en el mapa, no aparece acá.
             </p>
           </div>
         </div>
@@ -253,7 +262,7 @@ export function CrmProspeccion() {
               Buscar negocios con falencias digitales
             </span>
             <span className="text-[11px] text-muted-foreground block mt-0.5">
-              Prioriza negocios sin web, sin email, no aparecen en Google, o con problemas digitales. Son los que más necesitan tus servicios.
+              Prioriza los negocios que NO tienen web registrada en el mapa. Son los que más necesitan tus servicios.
             </span>
           </div>
         </label>
@@ -298,10 +307,17 @@ export function CrmProspeccion() {
       {!loading && prospects.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-emerald-400" />
-              {prospects.length} prospectos encontrados
-            </h3>
+            <div>
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-emerald-400" />
+                {prospects.length} negocios reales encontrados
+              </h3>
+              {meta && (
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {meta.scanned} escaneados en {meta.city} · fuente: OpenStreetMap (ODbL) · propuestas generadas con deepseek-flash
+                </p>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">
               Score promedio: {(prospects.reduce((s, p) => s + p.potentialScore, 0) / prospects.length).toFixed(1)}/10
             </p>
@@ -342,6 +358,12 @@ export function CrmProspeccion() {
                             {prospect.phone}
                           </span>
                         )}
+                        {prospect.address && (
+                          <span className="flex items-center gap-1 text-muted-foreground">
+                            <MapPin className="w-3 h-3" />
+                            {prospect.address}
+                          </span>
+                        )}
                         {prospect.website && (
                           <a
                             href={prospect.website}
@@ -355,6 +377,16 @@ export function CrmProspeccion() {
                             <ExternalLink className="w-2.5 h-2.5" />
                           </a>
                         )}
+                        <a
+                          href={prospect.mapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1 text-sky-400 hover:underline"
+                        >
+                          <MapPin className="w-3 h-3" />
+                          Ver en el mapa
+                        </a>
                       </div>
                     </div>
 
@@ -465,7 +497,7 @@ export function CrmProspeccion() {
             Escribí el tipo de negocio que querés buscar (ej: "restaurantes", "gimnasios", "abogados") y la IA va a:
           </p>
           <ul className="text-xs text-muted-foreground mt-3 space-y-1 text-left max-w-md mx-auto list-decimal list-inside">
-            <li>Buscar negocios en Google</li>
+            <li>Buscar negocios reales en el mapa (OpenStreetMap)</li>
             <li>Extraer nombre, email, teléfono y web</li>
             <li>Analizar qué servicio de Impulsala les conviene</li>
             <li>Generar propuesta personalizada en español</li>
