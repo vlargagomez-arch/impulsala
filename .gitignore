@@ -1,8 +1,29 @@
 skills/
 node_modules/
 
+# Secretos y tokens locales (NUNCA subir)
 .vtok
 .dburl
 .dburl2.tmp
 .cronsecret.tmp
+.env
+.env.local
+.env*.local
 scripts/find-supabase-host.cjs
+
+# Salidas de build y despliegue
+.next/
+.vercel/
+out/
+build/
+dist/
+tsconfig.tsbuildinfo
+
+# Basura de agentes/pruebas
+dev.log
+server.log
+tool-results/
+db/
+.zscripts/
+screenshot-*.png
+*.analysis.json

@@ -341,7 +341,7 @@ export async function GET(req: NextRequest) {
     else return NextResponse.json({ error: `Tarea desconocida: ${task}` }, { status: 400 });
 
     await logRun(task, "ok", result.detail, Date.now() - started, result.extra);
-    return NextResponse.json({ ok: true, ...result, ms: Date.now() - started });
+    return NextResponse.json({ ...result, ms: Date.now() - started });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[cron]", task, err);
