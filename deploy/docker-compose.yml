@@ -1,0 +1,42 @@
+# Impulsala en un VPS: app + Postgres propio + HTTPS automático con Caddy.
+#   cd deploy && docker compose up -d --build
+# Si sigues usando Supabase, borra el servicio `db` y su `depends_on`, y deja
+# el DATABASE_URL de Supabase en el .env de la raíz.
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    env_file:
+      - ../.env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:-postgresql://impulsala:impulsala@db:5432/impulsala?sslmode=disable}
+    restart: unless-stopped
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: impulsala
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-impulsala}
+      POSTGRES_DB: impulsala
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    command: caddy reverse-proxy --from ${DOMAIN:-impulsala.com} --to app:3000
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  caddy_data:
