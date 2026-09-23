@@ -11,5 +11,8 @@
       "maxDuration": 60
     }
   },
-  "crons": []
+  "crons": [
+    { "path": "/api/agents/cron?task=blog", "schedule": "0 14 * * *" },
+    { "path": "/api/agents/cron?task=followup", "schedule": "0 13 * * *" }
+  ]
 }

@@ -148,6 +148,31 @@ model OAuthToken {
   updatedAt    DateTime @updatedAt
 }
 
+model AgentRun {
+  id         String   @id @default(cuid())
+  agent      String // chat | blog | followup | report
+  status     String   @default("ok") // ok | error
+  summary    String   @default("")
+  tokens     Int      @default(0)
+  durationMs Int      @default(0)
+  meta       String?
+  createdAt  DateTime @default(now())
+
+  @@index([agent])
+  @@index([createdAt])
+}
+
+model AgentLog {
+  id             String   @id @default(cuid())
+  conversationId String?
+  role           String // user | agent | tool
+  content        String
+  createdAt      DateTime @default(now())
+
+  @@index([conversationId])
+  @@index([createdAt])
+}
+
 model BlogArticle {
   id          String   @id @default(cuid())
   slug        String   @unique

@@ -256,6 +256,53 @@ export default function AiChatFab() {
     }, delay + Math.random() * 150);
   }, []);
 
+  // Espejo de la conversación para enviarla como memoria al agente IA del servidor
+  const messagesRef = useRef<Msg[]>([]);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  /**
+   * Habla con el agente IA real (DeepSeek) del servidor.
+   * Ese agente puede guardar el lead en el CRM y agendar la cita con Google Calendar.
+   */
+  const askAgent = useCallback(async (text: string, historial: Msg[]) => {
+    setTyping(true);
+    const history = historial
+      .filter((m) => m.text && !m.formField)
+      .slice(-8)
+      .map((m) => ({
+        role: (m.role === "bot" ? "assistant" : "user") as "assistant" | "user",
+        content: m.text,
+      }));
+
+    try {
+      const res = await fetch("/api/agents/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: text,
+          history,
+          page: typeof window !== "undefined" ? window.location.pathname : undefined,
+        }),
+      });
+      const data = (await res.json()) as { reply?: string; error?: string };
+      const reply = (data?.reply || "").trim();
+      if (!res.ok || !reply) throw new Error(data?.error || "sin respuesta del agente");
+
+      const invitaAgendar = /agendar|agenda|cita|videollamada|diagn[oó]stico/i.test(reply);
+      setMessages((prev) => [
+        ...prev,
+        { role: "bot", text: reply, suggestions: invitaAgendar ? ["Agendar cita gratis"] : undefined },
+      ]);
+    } catch {
+      // Si el agente no responde, cae al guion local para no dejar al visitante colgado
+      setMessages((prev) => [...prev, pickGeneralResponse(text)]);
+    } finally {
+      setTyping(false);
+    }
+  }, []);
+
   const startBooking = useCallback((service?: string) => {
     setMode("booking");
     setBookingStep(0);
@@ -512,71 +559,20 @@ Te enviaremos un correo a ${data.email} con todos los detalles. Pronto nos vemos
       return;
     }
 
+    const historial = messagesRef.current;
     setInput("");
     setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
 
-    // Modo diagnóstico — responder según el servicio que le interesa
-    if (mode === "diagnostic") {
-      setTyping(true);
-      setTimeout(() => {
-        const n = normalize(trimmed);
-        let response: Msg;
-
-        if (n.includes("web") || n.includes("pagina") || n.includes("sitio")) {
-          response = {
-            role: "bot",
-            text: "¡Excelente! Desarrollamos páginas web ultra rápidas con Next.js, optimizadas para Google y diseñadas para convertir visitantes en clientes. Desde $500.000 COP. ¿Quieres que agendemos una videollamata de 30 minutos para revisar tu caso?",
-            suggestions: ["Sí, agendar cita gratis"],
-          };
-        } else if (n.includes("automat") || n.includes("bot") || n.includes("ia")) {
-          response = {
-            role: "bot",
-            text: "¡Perfecto! Implementamos agentes de IA que atienden clientes 24/7, chatbots inteligentes y automatización de procesos. Imagina que tu negocio nunca duerme. ¿Te gustaría agendar una cita para contarnos tu caso?",
-            suggestions: ["Sí, agendar cita gratis"],
-          };
-        } else if (n.includes("ads") || n.includes("publicidad") || n.includes("google") || n.includes("meta") || n.includes("instagram") || n.includes("tiktok")) {
-          response = {
-            role: "bot",
-            text: "¡Genial! Manejamos campañas en Google Ads, Meta Ads (Facebook/Instagram) y TikTok Ads. Reducimos tu costo por lead y aumentamos tus ventas. ¿Agendamos una videollamata para tu estrategia?",
-            suggestions: ["Sí, agendar cita gratis"],
-          };
-        } else if (n.includes("seo") || n.includes("posicion") || n.includes("google")) {
-          response = {
-            role: "bot",
-            text: "¡Excelente! Nuestro SEO orgánico muestra resultados en 1-2 meses. Te posicionamos en los primeros resultados de Google. ¿Quieres agendar una cita para auditar tu web?",
-            suggestions: ["Sí, agendar cita gratis"],
-          };
-        } else if (n.includes("no estoy seguro") || n.includes("ayuda") || n.includes("no se")) {
-          response = {
-            role: "bot",
-            text: "¡No te preocupes! Para eso estoy aquí. Cuéntame un poco sobre tu negocio: ¿Qué vendes? ¿Tienes página web? ¿Cómo consigues clientes actualmente?",
-            suggestions: ["Tengo un negocio físico", "Vendo online", "No tengo web aún"],
-          };
-        } else {
-          response = {
-            role: "bot",
-            text: "¡Entendido! Lo que necesitas suena muy interesante. Te recomiendo agendar una videollamata gratuita de 30 minutos con nuestro equipo. Ahí podemos revisar tu caso en detalle y darte una propuesta personalizada. ¿Te animas?",
-            suggestions: ["Sí, agendar cita gratis"],
-          };
-        }
-        setMessages((prev) => [...prev, response]);
-        setTyping(false);
-      }, 400 + Math.random() * 200);
-      return;
-    }
-
+    // Atajo: si pide cita explícitamente, abrimos el formulario guiado (más rápido que el LLM)
     if (wantsToBook(trimmed)) {
       startBooking();
       return;
     }
 
-    setTyping(true);
-    setTimeout(() => {
-      const reply = pickGeneralResponse(trimmed);
-      setMessages((prev) => [...prev, reply]);
-      setTyping(false);
-    }, 300 + Math.random() * 200);
-  }, [typing, mode, bookingStep, processBookingField]);
+    // Todo lo demás lo responde el agente IA real, con memoria de la conversación.
+    // Ese agente guarda el lead en el CRM y agenda la cita por sí solo.
+    askAgent(trimmed, historial);
+  }, [typing, mode, bookingStep, processBookingField, startBooking, askAgent]);
 
   const handleSuggestion = useCallback((suggestion: string) => {
     const n = normalize(suggestion);
