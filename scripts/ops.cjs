@@ -13,7 +13,7 @@
  * Lee secretos de archivos locales (nunca del chat): .dburl, .vtok y el secreto de cron.
  */
 
-const { execFileSync } = require("child_process");
+const { execFileSync, execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
@@ -31,8 +31,15 @@ const ghToken = () => readIf(path.join(ROOT, ".vtok"));
 const cronSecret = () => readIf(CRON_SECRET_FILE);
 const adminCookie = `nexus-admin-session=${Buffer.from("admin@impulsala.com:1").toString("base64")}`;
 
-const sh = (cmd, args, opts = {}) =>
-  execFileSync(cmd, args, { cwd: ROOT, encoding: "utf8", stdio: "pipe", ...opts }).trim();
+const sh = (cmd, args, opts = {}) => {
+  const common = { cwd: ROOT, encoding: "utf8", stdio: "pipe", ...opts };
+  // En Windows `vercel`/`git` son shims .cmd: hay que pasar por el shell y citar los argumentos
+  if (process.platform === "win32") {
+    const quoted = [cmd, ...args.map((a) => (/[\s"]/.test(String(a)) ? `"${String(a).replace(/"/g, '\\"')}"` : String(a)))].join(" ");
+    return execSync(quoted, common).trim();
+  }
+  return execFileSync(cmd, args, common).trim();
+};
 
 async function code(pathname, opts = {}) {
   const res = await fetch(SITE + pathname, { redirect: "manual", ...opts });
