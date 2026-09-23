@@ -292,6 +292,57 @@ export type SearchResult = {
   degraded: boolean;
 };
 
+const EMAIL_RE = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi;
+/** Correos que NO son del negocio (trackers, plantillas, dominios de prueba). */
+const EMAIL_BLACKLIST =
+  /sentry|wixpress|example\.|domain\.|\.png|\.jpg|\.jpeg|\.webp|\.gif|godaddy|squarespace|shopify|wordpress\.org|schema\.org|w3\.org|acme|yourdomain|email\.com|cloudflare|jquery|bootstrap|gravatar/i;
+
+/**
+ * Busca el correo del negocio en su propia web (el mapa casi nunca lo trae).
+ * Solo para los que tienen web y no tienen correo. Honesto: si no aparece, queda null.
+ */
+export async function enrichEmails(businesses: RealBusiness[], maxSitios = 10): Promise<RealBusiness[]> {
+  const pendientes = businesses.filter((b) => !b.email && b.website).slice(0, maxSitios);
+  if (!pendientes.length) return businesses;
+
+  await Promise.all(
+    pendientes.map(async (b) => {
+      const base = b.website!.startsWith("http") ? b.website! : `https://${b.website}`;
+      const urls = [base, `${base.replace(/\/$/, "")}/contacto`, `${base.replace(/\/$/, "")}/contact`];
+      for (const url of urls) {
+        try {
+          const res = await fetch(url, {
+            headers: { "User-Agent": UA },
+            cache: "no-store",
+            redirect: "follow",
+            signal: AbortSignal.timeout(6000),
+          });
+          if (!res.ok) continue;
+          const html = (await res.text()).slice(0, 300_000);
+          const candidatos = (html.match(EMAIL_RE) || []).filter((e) => !EMAIL_BLACKLIST.test(e));
+          if (candidatos.length) {
+            // El más probable: el que comparte dominio con la web, si no el primero.
+            const host = (() => {
+              try {
+                return new URL(base).hostname.replace(/^www\./, "");
+              } catch {
+                return "";
+              }
+            })();
+            const dominio = candidatos.find((e) => host && e.toLowerCase().includes(host.split(".")[0]));
+            b.email = (dominio || candidatos[0]).toLowerCase();
+            return;
+          }
+        } catch {
+          // siguiente URL
+        }
+      }
+    }),
+  );
+
+  return businesses;
+}
+
 /** Resultados en memoria por 10 minutos (misma búsqueda repetida = instantánea). */
 const searchCache = new Map<string, { at: number; result: SearchResult }>();
 const CACHE_TTL_MS = 10 * 60 * 1000;

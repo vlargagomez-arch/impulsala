@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth-guard";
-import { searchBusinesses, type RealBusiness } from "@/lib/prospect-maps";
+import { searchBusinesses, enrichEmails, type RealBusiness } from "@/lib/prospect-maps";
 
 /**
  * POST /api/prospeccion
@@ -226,6 +226,8 @@ export async function POST(req: NextRequest) {
     }
 
     const services = businesses.map(recommendService);
+    // Correos: el mapa casi nunca los trae, se buscan en la web del negocio (con tope de 8 sitios).
+    await enrichEmails(businesses, 8);
     const texts = await generateProposals(businesses, search.city, services);
 
     const prospects: Prospect[] = businesses.map((b, i) => {
