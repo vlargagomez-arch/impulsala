@@ -68,6 +68,8 @@ export function CrmProspeccion() {
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [meta, setMeta] = useState<{ provider: string; city: string; scanned: number } | null>(null);
+  const [enviando, setEnviando] = useState<number | null>(null);
+  const [enviados, setEnviados] = useState<Record<number, string>>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,6 +116,30 @@ export function CrmProspeccion() {
     navigator.clipboard.writeText(text);
     setCopiedIdx(idx);
     setTimeout(() => setCopiedIdx(null), 2000);
+  };
+
+  /** Envía la propuesta al correo del negocio (Gmail del proyecto, uno por uno). */
+  const enviarPropuesta = async (prospect: Prospect, idx: number) => {
+    if (enviando !== null) return;
+    setEnviando(idx);
+    try {
+      const res = await fetch("/api/prospeccion/enviar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: prospect.email,
+          subject: prospect.subject,
+          body: prospect.proposal,
+          negocio: prospect.businessName,
+        }),
+      });
+      const data = await res.json();
+      setEnviados((s) => ({ ...s, [idx]: data.ok ? "enviado" : data.error || "No se pudo enviar" }));
+    } catch {
+      setEnviados((s) => ({ ...s, [idx]: "Error de red al enviar" }));
+    } finally {
+      setEnviando(null);
+    }
   };
 
   // Sugerencias rápidas de búsqueda
@@ -454,15 +480,30 @@ export function CrmProspeccion() {
                         )}
                       </button>
 
-                      {prospect.email && (
-                        <a
-                          href={`mailto:${prospect.email}?subject=${encodeURIComponent(prospect.subject)}&body=${encodeURIComponent(prospect.proposal)}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-all"
+                      {prospect.email ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            enviarPropuesta(prospect, idx);
+                          }}
+                          disabled={enviando !== null || enviados[idx] === "enviado"}
+                          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-all disabled:opacity-60"
                         >
                           <Mail className="w-4 h-4" />
-                          Enviar email
-                        </a>
+                          {enviados[idx] === "enviado"
+                            ? "¡Propuesta enviada!"
+                            : enviando === idx
+                              ? "Enviando..."
+                              : "Enviar propuesta"}
+                        </button>
+                      ) : (
+                        <span className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-muted/40 border border-border text-muted-foreground text-xs">
+                          <Mail className="w-3.5 h-3.5" />
+                          Sin correo en el mapa: contactalo por WhatsApp
+                        </span>
+                      )}
+                      {enviados[idx] && enviados[idx] !== "enviado" && (
+                        <span className="text-[11px] text-rose-400 self-center">{enviados[idx]}</span>
                       )}
 
                       {prospect.phone && (

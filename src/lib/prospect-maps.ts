@@ -110,7 +110,13 @@ const NOMINATIM_MIN_GAP_MS = 1200;
 let lastNominatimAt = 0;
 
 async function nominatimLookup(location: string) {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(location)}`;
+  // Si el texto no nombra otro país, se restringe a Colombia: evita que un nombre raro
+  // resuelva en el otro lado del mundo (pasó: "Bogotá" mal codificado → Tajikistán).
+  const otroPais = /mexico|peru|ecuador|panama|venezuela|chile|argentina|bolivia|brasil|brazil|espa|espana|spain|estados unidos|usa|united states|costa rica|guatemala|honduras|nicaragua|salvador|paraguay|uruguay|cuba|republica dominicana/i.test(
+    location,
+  );
+  const co = otroPais ? "" : "&countrycodes=co";
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1${co}&q=${encodeURIComponent(location)}`;
   const run = async () => {
     const wait = Math.max(0, lastNominatimAt + NOMINATIM_MIN_GAP_MS - Date.now());
     if (wait) await new Promise((r) => setTimeout(r, wait));
@@ -266,6 +272,17 @@ function normalizeName(name: string): string {
   return strip(name).replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ");
 }
 
+/** Distancia en metros entre dos coordenadas (para descartar resultados fuera del área). */
+function distanciaM(aLat: number, aLon: number, bLat: number, bLon: number): number {
+  const R = 6371000;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLon = ((bLon - aLon) * Math.PI) / 180;
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
 export type SearchResult = {
   businesses: RealBusiness[];
   city: string;
@@ -341,6 +358,8 @@ export async function searchBusinesses(opts: {
 
     const key = normalizeName(name);
     if (seen.has(key)) continue;
+    // Guardia final: el negocio tiene que estar de verdad en la ciudad buscada.
+    if (distanciaM(geo.lat, geo.lon, lat, lon) > radius + 2000) continue;
     seen.add(key);
 
     businesses.push({
