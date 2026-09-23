@@ -233,12 +233,15 @@ async function overpass(query: string): Promise<any[] | null> {
     // Los tres mirrors en paralelo: gana el que responda primero (suele ser ~2-6 s).
     return await Promise.any(OVERPASS_MIRRORS.map(attempt));
   } catch {
-    // Un único reintento por el mirror principal: sin esto, un pico de 504 colgaba la búsqueda.
-    try {
-      return await attempt(OVERPASS_MIRRORS[0]);
-    } catch {
-      return null; // null = los mapas fallaron (no es lo mismo que "sin resultados")
+    // Reintento en serie por cada mirror (los 504 son por pico de carga, no por la consulta).
+    for (const m of OVERPASS_MIRRORS) {
+      try {
+        return await attempt(m);
+      } catch {
+        // siguiente
+      }
     }
+    return null; // null = los mapas fallaron (no es lo mismo que "sin resultados")
   }
 }
 
@@ -299,7 +302,7 @@ export async function searchBusinesses(opts: {
   }
 
   const radius = opts.radiusMeters ?? 15_000;
-  const deadline = Date.now() + 35_000; // presupuesto de los mapas (la función de Vercel corta a 60 s)
+  const deadline = Date.now() + 45_000; // presupuesto de los mapas (la función de Vercel corta a 60 s)
   const { filters, label } = filtersForCategory(opts.category);
   const safe = opts.category.replace(/["\\]/g, "").slice(0, 40);
   const selectors = filters.length

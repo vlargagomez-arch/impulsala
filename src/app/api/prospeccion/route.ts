@@ -148,7 +148,7 @@ REGLAS:
         max_tokens: 4096,
         response_format: { type: "json_object" },
       }),
-      signal: AbortSignal.timeout(18_000),
+      signal: AbortSignal.timeout(11_000),
     });
 
     if (!res.ok) throw new Error(`DeepSeek ${res.status}`);
