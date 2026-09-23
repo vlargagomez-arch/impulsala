@@ -14,10 +14,7 @@ import {
   Menu,
   X,
   ShieldCheck,
-  Video,
   Target,
-  Rocket,
-  Sparkles,
   Users,
 } from "lucide-react";
 import { CrmDashboard } from "./dashboard";
@@ -26,12 +23,10 @@ import { CrmAppointments } from "./appointments";
 import { CrmNewsletter } from "./newsletter";
 import { CrmCampaigns } from "./campaigns";
 import { CrmBlog } from "./blog";
-import { CrmMarketing } from "./marketing";
 import { CrmProspeccion } from "./prospeccion";
-import { CrmGuiaMarketing } from "./guia-marketing";
 import { CrmAgentes } from "./agentes";
 
-type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "marketing" | "guia" | "agentes" | "prospeccion" | "blog";
+type Tab = "dashboard" | "agentes" | "leads" | "appointments" | "newsletter" | "campaigns" | "prospeccion" | "blog";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -69,18 +64,6 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string 
     label: "Enviar Newsletter",
     icon: <Send className="w-4 h-4" />,
     description: "Crea y envía newsletters a tus suscriptores",
-  },
-  {
-    id: "marketing",
-    label: "Marketing Digital",
-    icon: <Sparkles className="w-4 h-4" />,
-    description: "Guiones, voz IA y avatar. Todo integrado, todo gratis.",
-  },
-  {
-    id: "guia",
-    label: "Guía Maestra Marketing",
-    icon: <Rocket className="w-4 h-4" />,
-    description: "Plan paso a paso para ventas y viralidad. Tu experto en marketing.",
   },
   {
     id: "prospeccion",
@@ -234,8 +217,6 @@ export function CrmApp({ userEmail }: { userEmail: string }) {
           {tab === "appointments" && <CrmAppointments />}
           {tab === "newsletter" && <CrmNewsletter />}
           {tab === "campaigns" && <CrmCampaigns />}
-          {tab === "marketing" && <CrmMarketing />}
-          {tab === "guia" && <CrmGuiaMarketing />}
           {tab === "prospeccion" && <CrmProspeccion />}
           {tab === "blog" && <CrmBlog />}
         </main>
