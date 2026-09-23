@@ -16,7 +16,6 @@ import {
   X,
   ShieldCheck,
   Target,
-  Users,
 } from "lucide-react";
 import { CrmDashboard } from "./dashboard";
 import { CrmKanban } from "./kanban";
@@ -25,10 +24,9 @@ import { CrmNewsletter } from "./newsletter";
 import { CrmCampaigns } from "./campaigns";
 import { CrmBlog } from "./blog";
 import { CrmProspeccion } from "./prospeccion";
-import { CrmAgentes } from "./agentes";
 import { CrmAgents } from "./agents";
 
-type Tab = "dashboard" | "agentes" | "leads" | "appointments" | "automation" | "newsletter" | "campaigns" | "prospeccion" | "blog";
+type Tab = "dashboard" | "leads" | "appointments" | "automation" | "newsletter" | "campaigns" | "prospeccion" | "blog";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -36,12 +34,6 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string 
     label: "Dashboard",
     icon: <LayoutDashboard className="w-4 h-4" />,
     description: "Métricas y resumen general",
-  },
-  {
-    id: "agentes",
-    label: "Agentes Virtuales",
-    icon: <Users className="w-4 h-4" />,
-    description: "Tu equipo digital trabajando 24/7. Cada uno con su especialidad.",
   },
   {
     id: "leads",
@@ -220,7 +212,6 @@ export function CrmApp({ userEmail }: { userEmail: string }) {
         {/* Main */}
         <main className="p-4 lg:p-8">
           {tab === "dashboard" && <CrmDashboard />}
-          {tab === "agentes" && <CrmAgentes />}
           {tab === "leads" && <CrmKanban />}
           {tab === "appointments" && <CrmAppointments />}
           {tab === "automation" && <CrmAgents />}
