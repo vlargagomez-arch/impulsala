@@ -214,14 +214,14 @@ async function overpass(query: string): Promise<any[] | null> {
         ? await fetch(`${m.url}?data=${encodeURIComponent(query)}`, {
             headers: { "User-Agent": UA },
             cache: "no-store",
-            signal: AbortSignal.timeout(12_000),
+            signal: AbortSignal.timeout(10_000),
           })
         : await fetch(m.url, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": UA },
             body: `data=${encodeURIComponent(query)}`,
             cache: "no-store",
-            signal: AbortSignal.timeout(12_000),
+            signal: AbortSignal.timeout(10_000),
           });
     if (!res.ok) throw new Error(`Overpass ${res.status}`);
     const json = (await res.json()) as { elements?: any[] };
@@ -302,7 +302,7 @@ export async function searchBusinesses(opts: {
   }
 
   const radius = opts.radiusMeters ?? 15_000;
-  const deadline = Date.now() + 45_000; // presupuesto de los mapas (la función de Vercel corta a 60 s)
+  const deadline = Date.now() + 30_000; // presupuesto de los mapas (la función de Vercel corta a 60 s)
   const { filters, label } = filtersForCategory(opts.category);
   const safe = opts.category.replace(/["\\]/g, "").slice(0, 40);
   const selectors = filters.length
