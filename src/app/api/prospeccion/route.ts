@@ -108,7 +108,7 @@ Generá ${limit} prospectos reales de ${query} en ${location}:`;
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "deepseek-chat",
+      model: "deepseek-flash",
       messages: [
         {
           role: "system",

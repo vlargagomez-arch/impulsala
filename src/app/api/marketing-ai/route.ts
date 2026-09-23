@@ -233,7 +233,7 @@ async function callDeepSeek(message: string): Promise<string> {
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "deepseek-chat",
+      model: "deepseek-flash",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: message },

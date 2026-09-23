@@ -31,15 +31,17 @@ export async function runAgent(opts: {
   const steps: AgentStep[] = [];
   let tokens = 0;
   let text = "";
-  const model = opts.model || process.env.DEEPSEEK_MODEL || "deepseek-chat";
+  const model = opts.model || process.env.DEEPSEEK_MODEL || "deepseek-flash";
+  let served = "";
 
   for (let i = 0; i < maxSteps; i++) {
     const res = await chatCompletion({
       messages,
       tools,
       temperature: opts.temperature ?? 0.45,
-      model: opts.model,
+      model,
     });
+    served = res.model || served;
     tokens += res.tokens;
 
     const msg = res.message;
@@ -65,13 +67,14 @@ export async function runAgent(opts: {
 
     if (i === maxSteps - 1) {
       // Última pasada sin herramientas para forzar respuesta final en texto
-      const closing = await chatCompletion({ messages, temperature: opts.temperature ?? 0.45, model: opts.model });
+      const closing = await chatCompletion({ messages, temperature: opts.temperature ?? 0.45, model });
+      served = closing.model || served;
       tokens += closing.tokens;
       text = (closing.message.content || "").trim();
     }
   }
 
-  return { text, steps, tokens, model };
+  return { text, steps, tokens, model: served || model };
 }
 
 /** Historial de mensajes del widget convertido al formato del modelo. */

@@ -5,7 +5,7 @@
  * Variables de entorno:
  *   DEEPSEEK_API_KEY  (obligatoria)
  *   DEEPSEEK_BASE_URL (opcional, default https://api.deepseek.com/v1)
- *   DEEPSEEK_MODEL    (opcional, default deepseek-chat)
+ *   DEEPSEEK_MODEL    (opcional, default deepseek-flash = el modelo más económico)
  */
 
 export type ChatRole = "system" | "user" | "assistant" | "tool";
@@ -37,6 +37,8 @@ export type ChatResult = {
   message: ChatMessage;
   finishReason: string;
   tokens: number;
+  /** Modelo que realmente sirvió la respuesta (lo devuelve la API). */
+  model?: string;
 };
 
 export class DeepSeekError extends Error {
@@ -49,7 +51,7 @@ export class DeepSeekError extends Error {
 }
 
 const BASE_URL = (process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com/v1").replace(/\/$/, "");
-export const DEFAULT_MODEL = process.env.DEEPSEEK_MODEL || "deepseek-chat";
+export const DEFAULT_MODEL = process.env.DEEPSEEK_MODEL || "deepseek-flash";
 
 export function hasDeepSeekKey(): boolean {
   return Boolean(process.env.DEEPSEEK_API_KEY);
@@ -105,6 +107,7 @@ export async function chatCompletion(opts: {
     const data = (await res.json()) as {
       choices?: { message?: ChatMessage; finish_reason?: string }[];
       usage?: { total_tokens?: number };
+      model?: string;
       error?: { message?: string };
     };
 
@@ -121,6 +124,7 @@ export async function chatCompletion(opts: {
       },
       finishReason: choice.finish_reason || "stop",
       tokens: data.usage?.total_tokens || 0,
+      model: data.model,
     };
   } catch (err) {
     if (err instanceof DeepSeekError) throw err;
