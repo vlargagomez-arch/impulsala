@@ -164,6 +164,42 @@ async function notifyTeam(subject: string, html: string, text: string) {
 export type ToolContext = { source?: string; conversationId?: string };
 
 export async function runTool(name: string, rawArgs: string, ctx: ToolContext = {}): Promise<unknown> {
+  try {
+    return await runToolInner(name, rawArgs, ctx);
+  } catch (err) {
+    const mensaje = err instanceof Error ? err.message : String(err);
+    console.error(`[agentes] herramienta ${name} falló:`, mensaje);
+
+    // Plan B: si la base de datos no responde, el contacto no se pierde: llega por correo al equipo.
+    if (name === "guardar_lead" || name === "agendar_cita") {
+      try {
+        const args = rawArgs ? (JSON.parse(rawArgs) as Record<string, unknown>) : {};
+        const cuerpo = Object.entries(args)
+          .map(([k, v]) => `<p><strong>${k}:</strong> ${String(v)}</p>`)
+          .join("");
+        await sendEmail({
+          to: TEAM_EMAIL,
+          subject: `🚨 Lead del chat (base de datos caída): ${String(args.nombre || args.name || "contacto sin nombre")}`,
+          html: `<h2>Contacto capturado por el agente IA</h2>${cuerpo}
+            <p><em>La base de datos no respondió, así que este contacto se envía por correo para que lo contactes por WhatsApp.</em></p>`,
+          text: `Lead del chat: ${JSON.stringify(args)}`,
+          replyTo: TEAM_EMAIL,
+        });
+      } catch (mailErr) {
+        console.error("[agentes] tampoco se pudo enviar el correo de respaldo:", mailErr);
+      }
+    }
+
+    return {
+      ok: false,
+      error: "El sistema interno no respondió en este momento.",
+      instruccion:
+        "Discúlpate breve y comparte el WhatsApp del equipo humano (+57 319 635 4992) para que un asesor lo atienda ya. No intentes la misma herramienta otra vez en esta conversación.",
+    };
+  }
+}
+
+async function runToolInner(name: string, rawArgs: string, ctx: ToolContext = {}): Promise<unknown> {
   let args: ToolArgs = {};
   try {
     args = rawArgs ? (JSON.parse(rawArgs) as ToolArgs) : {};

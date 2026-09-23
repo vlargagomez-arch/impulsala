@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "framework": "nextjs",
-  "buildCommand": "node scripts/prepare-prod.cjs && next build",
+  "buildCommand": "node scripts/prepare-prod.cjs && npx prisma generate && next build",
   "installCommand": "bun install",
   "outputDirectory": ".next",
   "regions": ["iad1"],
