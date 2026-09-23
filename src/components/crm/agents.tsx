@@ -87,7 +87,9 @@ export function CrmAgents() {
   }, []);
 
   useEffect(() => {
-    load();
+    // setTimeout(0): evita setState dentro del cuerpo del efecto (regla react-hooks/set-state-in-effect)
+    const t = setTimeout(load, 0);
+    return () => clearTimeout(t);
   }, [load]);
 
   if (loading && !data) {

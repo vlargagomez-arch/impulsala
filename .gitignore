@@ -27,3 +27,4 @@ db/
 .zscripts/
 screenshot-*.png
 *.analysis.json
+.hermes/
