@@ -114,7 +114,9 @@ async function cron(task) {
 
 function deploy() {
   const msg = process.argv[3] || `ops: despliegue ${new Date().toISOString()}`;
-  const dirty = sh("git", ["status", "--porcelain"]).split("\n").filter((l) => l.trim() && !l.includes("tsconfig.tsbuildinfo"));
+  const dirty = sh("git", ["status", "--porcelain"])
+    .split("\n")
+    .filter((l) => l.trim() && !l.includes("tsconfig.tsbuildinfo"));
   if (dirty.length) {
     sh("git", ["add", "-A"]);
     sh("git", ["commit", "-m", msg]);
@@ -122,19 +124,31 @@ function deploy() {
   } else {
     console.log("sin cambios locales que commitear");
   }
-  sh("git", ["fetch", "origin", "main"]);
-  try {
-    sh("git", ["rebase", "origin/main"]);
-  } catch {
-    console.log("rebase con conflictos: resuélvelos y vuelve a correr deploy");
-    process.exit(1);
-  }
+
+  // El repo es privado: fetch y push necesitan el token en la URL
   const token = ghToken();
   const origin = sh("git", ["remote", "get-url", "origin"]);
-  sh("git", ["remote", "set-url", "origin", `https://x-access-token:${token}@github.com/vlargagomez-arch/impulsala.git`]);
-  console.log(sh("git", ["push", "origin", "HEAD:main"]));
-  sh("git", ["remote", "set-url", "origin", origin]);
-  console.log(sh("vercel", ["--prod", "--yes"]).split("\n").filter((l) => /Aliased|readyState|Error/.test(l)).join("\n"));
+  const authed = `https://x-access-token:${token}@github.com/vlargagomez-arch/impulsala.git`;
+  try {
+    sh("git", ["remote", "set-url", "origin", authed]);
+    sh("git", ["fetch", "origin", "main"]);
+    try {
+      sh("git", ["rebase", "origin/main"]);
+    } catch {
+      console.log("rebase con conflictos: resuélvelos y vuelve a correr deploy");
+      process.exit(1);
+    }
+    console.log(sh("git", ["push", "origin", "HEAD:main"]));
+  } finally {
+    sh("git", ["remote", "set-url", "origin", origin]);
+  }
+
+  console.log(
+    sh("vercel", ["--prod", "--yes"])
+      .split("\n")
+      .filter((l) => /Aliased|readyState|Error/i.test(l))
+      .join("\n")
+  );
   return status();
 }
 
