@@ -1,2 +1,8 @@
 skills/
 node_modules/
+
+.vtok
+.dburl
+.dburl2.tmp
+.cronsecret.tmp
+scripts/find-supabase-host.cjs
