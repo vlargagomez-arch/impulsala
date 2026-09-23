@@ -10,6 +10,14 @@ import { db } from "@/lib/db";
  */
 
 export async function GET(req: NextRequest) {
+  // Protegido: este endpoint inserta datos de demo, así que NO puede quedar público.
+  const secret = process.env.CRON_SECRET;
+  const provided = req.nextUrl.searchParams.get("secret") || "";
+  const auth = req.headers.get("authorization") || "";
+  if (!secret || (provided !== secret && auth !== `Bearer ${secret}`)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
   try {
     const results: string[] = [];
 
