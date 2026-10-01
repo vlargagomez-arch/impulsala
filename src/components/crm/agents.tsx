@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Bot, RefreshCw, Sparkles, Calendar, FileText, Mail, MessageSquare, AlertTriangle } from "lucide-react";
+import { Bot, RefreshCw, Sparkles, Calendar, FileText, Mail, MessageSquare, AlertTriangle, Play, CheckCircle2, XCircle } from "lucide-react";
 
 type AgentRun = {
   id: string;
@@ -66,10 +66,31 @@ function fmt(date: string) {
   return new Date(date).toLocaleString("es-CO", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
+/** "hace 3 min", "hace 2 h", "hace 4 días" */
+function haceCuanto(date: string | Date) {
+  const ms = Date.now() - new Date(date).getTime();
+  const min = Math.round(ms / 60000);
+  if (min < 1) return "hace segundos";
+  if (min < 60) return `hace ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `hace ${h} h`;
+  const d = Math.round(h / 24);
+  return `hace ${d} día${d === 1 ? "" : "s"}`;
+}
+
+/** Qué agentes se pueden disparar a mano desde el panel. */
+const TAREA_POR_AGENTE: Record<string, string | undefined> = {
+  blog: "blog",
+  followup: "followup",
+  report: "report",
+};
+
 export function CrmAgents() {
   const [data, setData] = useState<Status | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [corriendo, setCorriendo] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<{ ok: boolean; texto: string } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -91,6 +112,33 @@ export function CrmAgents() {
     const t = setTimeout(load, 0);
     return () => clearTimeout(t);
   }, [load]);
+
+  /** Dispara un agente a mano (POST /api/agents/run) y refresca el panel. */
+  const ejecutar = useCallback(
+    async (tarea: string) => {
+      setCorriendo(tarea);
+      setAviso(null);
+      try {
+        const res = await fetch("/api/agents/run", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ task: tarea }),
+        });
+        const json = await res.json();
+        setAviso(
+          res.ok
+            ? { ok: true, texto: `${tarea}: ${json.detail || "listo"} (${((json.ms || 0) / 1000).toFixed(1)} s)` }
+            : { ok: false, texto: `${tarea}: ${json.error || "falló"}` },
+        );
+      } catch (err) {
+        setAviso({ ok: false, texto: err instanceof Error ? err.message : "Error de red" });
+      } finally {
+        setCorriendo(null);
+        load();
+      }
+    },
+    [load],
+  );
 
   if (loading && !data) {
     return <div className="text-sm text-muted-foreground">Cargando el estado de los agentes…</div>;
@@ -137,22 +185,74 @@ export function CrmAgents() {
           </button>
         </div>
 
+        {aviso && (
+          <div
+            className={`mt-4 flex items-start gap-2 rounded-xl border px-3 py-2 text-xs ${
+              aviso.ok
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                : "border-rose-500/40 bg-rose-500/10 text-rose-300"
+            }`}
+          >
+            {aviso.ok ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <XCircle className="w-4 h-4 shrink-0" />}
+            <span>{aviso.texto}</span>
+          </div>
+        )}
+
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {estado.agentes.map((a) => (
-            <div key={a.id} className="rounded-xl border border-border/60 bg-background/40 p-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-foreground">{a.nombre}</p>
-                <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                    a.activo ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" : "border-rose-500/40 text-rose-400 bg-rose-500/10"
-                  }`}
-                >
-                  {a.activo ? "ACTIVO" : "INACTIVO"}
-                </span>
+          {estado.agentes.map((a) => {
+            const ultima = runs.find((r) => r.agent === a.id);
+            const tarea = TAREA_POR_AGENTE[a.id];
+            const ocupado = corriendo === tarea && Boolean(tarea);
+            return (
+              <div key={a.id} className="rounded-xl border border-border/60 bg-background/40 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-foreground">{a.nombre}</p>
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                      a.activo ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10" : "border-rose-500/40 text-rose-400 bg-rose-500/10"
+                    }`}
+                  >
+                    {a.activo ? "ACTIVO" : "INACTIVO"}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">{a.detalle}</p>
+
+                <div className="mt-2 flex items-center gap-2 text-[11px]">
+                  {ultima ? (
+                    <>
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 ${
+                          ultima.status === "ok"
+                            ? "border-emerald-500/40 text-emerald-400 bg-emerald-500/10"
+                            : "border-rose-500/40 text-rose-400 bg-rose-500/10"
+                        }`}
+                      >
+                        {ultima.status === "ok" ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                        {ultima.status === "ok" ? "última: OK" : "última: FALLÓ"}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {haceCuanto(ultima.createdAt)} · {(ultima.durationMs / 1000).toFixed(1)} s
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-muted-foreground">sin corridas todavía</span>
+                  )}
+                </div>
+                {ultima && <p className="mt-1 text-[11px] text-foreground/60 line-clamp-2">{ultima.summary}</p>}
+
+                {tarea && (
+                  <button
+                    onClick={() => ejecutar(tarea)}
+                    disabled={ocupado}
+                    className="mt-3 flex items-center gap-2 rounded-lg border border-violet-500/40 bg-violet-500/10 px-3 py-1.5 text-xs text-violet-200 hover:bg-violet-500/20 disabled:opacity-50 transition"
+                  >
+                    <Play className={`w-3 h-3 ${ocupado ? "animate-pulse" : ""}`} />
+                    {ocupado ? "Trabajando…" : "Ejecutar ahora"}
+                  </button>
+                )}
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">{a.detalle}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
