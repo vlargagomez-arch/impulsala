@@ -8,7 +8,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email-sender";
-import { chatCompletion, type ToolSchema } from "./deepseek";
+import { chatCompletion, extractJson, type ToolSchema } from "./deepseek";
 import { BUSINESS } from "./knowledge";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -378,7 +378,8 @@ export async function extractLeadFromText(text: string): Promise<{ nombre?: stri
     maxTokens: 200,
   });
   try {
-    return JSON.parse(raw.message.content || "{}");
+    const parsed = extractJson(raw.message.content || "{}");
+    return (parsed && typeof parsed === "object" ? parsed : {}) as { nombre?: string; email?: string; telefono?: string };
   } catch {
     return {};
   }

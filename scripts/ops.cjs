@@ -97,12 +97,17 @@ async function env() {
 }
 
 async function logs() {
-  const deps = sh("vercel", ["ls", "impulsala", "--json"]);
-  const list = JSON.parse(deps);
-  const latest = (Array.isArray(list) ? list : list.deployments || []).find((d) => d.target === "production") || list[0];
-  const url = latest?.url?.startsWith("http") ? latest.url : `https://${latest?.url}`;
-  console.log("Deploy:", url, "|", latest?.state || latest?.readyState);
-  console.log(sh("vercel", ["logs", url, "--json"]).split("\n").slice(0, 12).join("\n"));
+  // OJO: la CLI de Vercel (>=54) ya no acepta --json en "vercel ls" ni en "vercel logs".
+  const listado = sh("vercel", ["list", "impulsala"]);
+  console.log(listado.split("\n").slice(0, 14).join("\n"));
+
+  const url = (listado.match(/https:\/\/impulsala-[a-z0-9-]+\.vercel\.app/g) || [])[0];
+  if (!url) {
+    console.log("no pude leer la URL del despliegue; corre 'vercel list impulsala' a mano");
+    return;
+  }
+  console.log("\n--- runtime logs (últimas líneas) ---");
+  console.log(sh("vercel", ["logs", url]).split("\n").slice(0, 40).join("\n"));
 }
 
 async function cron(task) {

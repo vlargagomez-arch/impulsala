@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { askOnce, hasDeepSeekKey } from "@/lib/agents/deepseek";
+import { askJson, askOnce, hasDeepSeekKey } from "@/lib/agents/deepseek";
 import { knowledgeDigest, BUSINESS } from "@/lib/agents/knowledge";
 import { sendEmail } from "@/lib/email-sender";
 import { TEAM_EMAIL } from "@/lib/agents/tools";
@@ -68,7 +68,14 @@ async function taskBlog(): Promise<TaskResult> {
   const titulos = existentes.map((a) => `- ${a.title}`).join("\n") || "(todavía no hay artículos)";
   const categorias = Array.from(new Set(existentes.map((a) => a.category))).join(", ") || "Marketing Digital";
 
-  const raw = await askOnce({
+  const { data: parsed } = await askJson<{
+    title?: string;
+    excerpt?: string;
+    category?: string;
+    tags?: string;
+    imagePrompt?: string;
+    blocks?: unknown[];
+  }>({
     system: `Eres el redactor SEO senior de ${BUSINESS.nombre}, agencia de ${BUSINESS.ciudad} que vende desarrollo web, SEO, publicidad digital y automatización con IA a pymes colombianas.
 
 CONOCIMIENTO REAL DEL NEGOCIO (no inventes datos fuera de esto):
@@ -103,23 +110,8 @@ Devuelve SOLO JSON con esta forma exacta:
 }
 Reglas: entre 6 y 12 bloques, cada párrafo de 40 a 90 palabras, español de Colombia, sin markdown dentro del texto, sin encabezados con "#".`,
     temperature: 0.8,
-    jsonMode: true,
-    maxTokens: 2600,
+    maxTokens: 4200,
   });
-
-  let parsed: {
-    title?: string;
-    excerpt?: string;
-    category?: string;
-    tags?: string;
-    imagePrompt?: string;
-    blocks?: unknown[];
-  };
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    throw new Error("El agente no devolvió JSON válido para el artículo");
-  }
 
   if (!parsed.title || !parsed.blocks?.length) throw new Error("Artículo incompleto (sin título o sin bloques)");
 
@@ -181,7 +173,7 @@ async function taskFollowup(): Promise<TaskResult> {
 
     const contexto = [lead.notes, ...lead.leadNotes.map((n) => n.content)].filter(Boolean).join(" | ");
 
-    const raw = await askOnce({
+    const { data: mail } = await askJson<{ subject?: string; body?: string }>({
       system: `Eres el asesor comercial senior de ${BUSINESS.nombre} (${BUSINESS.ciudad}). Escribes correos de seguimiento cortos, humanos y sin sonar a plantilla. Español de Colombia, trato cercano, cero exageración.
 
 CONOCIMIENTO DEL NEGOCIO:
@@ -197,17 +189,10 @@ Datos:
 Devuelve SOLO JSON:
 {"subject":"asunto corto y personal, máximo 60 caracteres","body":"cuerpo del correo, máximo 130 palabras, 3 párrafos cortos, termina invitando a responder este correo o escribir al WhatsApp +57 319 635 4992 para la videollamada gratis de 30 minutos"}`,
       temperature: 0.7,
-      jsonMode: true,
-      maxTokens: 900,
+      maxTokens: 1400,
     });
 
-    let mail: { subject?: string; body?: string };
-    try {
-      mail = JSON.parse(raw);
-    } catch {
-      detalle.push(`${lead.name}: el texto generado no fue válido`);
-      continue;
-    }
+
 
     const html = `<div style="font-family:system-ui,Segoe UI,Arial,sans-serif;line-height:1.6;color:#1a1a1a">
       ${(mail.body || "")
