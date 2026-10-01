@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { ADMIN_EMAIL, isAdminEmail } from "@/lib/admin-email";
 
 /**
  * POST /api/login-direct
@@ -9,10 +10,9 @@ export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json();
 
-    const ADMIN_EMAIL = "admin@impulsala.com";
-    const ADMIN_PASSWORD = "Globe$12$3";
+    const ADMIN_PASSWORD = process.env.CRM_ADMIN_PASSWORD || "Globe$12$3";
 
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    if (isAdminEmail(email) && password === ADMIN_PASSWORD) {
       const sessionId = Buffer.from(`${email}:${Date.now()}`).toString("base64");
 
       const response = NextResponse.json({
@@ -78,6 +78,6 @@ export async function GET(req: NextRequest) {
     nexusCookie: nexusCookie ? "present" : "missing",
     decoded,
     email,
-    isAuthorized: email === "admin@impulsala.com",
+    isAuthorized: isAdminEmail(email),
   });
 }

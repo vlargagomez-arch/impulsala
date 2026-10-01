@@ -2,13 +2,14 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
+import { ADMIN_EMAIL } from "@/lib/admin-email";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "CRM Impulsala",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "admin@impulsala.com" },
+        email: { label: "Email", type: "email", placeholder: ADMIN_EMAIL },
         password: { label: "Contraseña", type: "password" },
       },
       async authorize(credentials) {
@@ -23,7 +24,7 @@ export const authOptions: NextAuthOptions = {
         const password = credentials.password;
 
         // Fallbacks hardcoded (cuando BD no funciona en producción)
-        const defaultEmail = process.env.CRM_ADMIN_EMAIL || "admin@impulsala.com";
+        const defaultEmail = ADMIN_EMAIL;
         const defaultPassword = process.env.CRM_ADMIN_PASSWORD || "Globe$12$3";
 
         // Si las credenciales coinciden con las hardcoded, permitir login directo

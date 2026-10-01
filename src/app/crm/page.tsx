@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { isAdminEmail } from "@/lib/admin-email";
 import { CrmApp } from "@/components/crm/app";
 import { CrmLogin } from "@/components/crm/login";
 import type { NextRequest } from "next/server";
@@ -21,7 +22,7 @@ export default async function CrmPage(req: NextRequest) {
       const cookieValue = decodeURIComponent(match[1]);
       const decoded = Buffer.from(cookieValue, "base64").toString();
       const [email] = decoded.split(":");
-      if (email === "admin@impulsala.com") {
+      if (isAdminEmail(email)) {
         userEmail = email;
       }
     }
@@ -36,7 +37,7 @@ export default async function CrmPage(req: NextRequest) {
       try {
         const decoded = Buffer.from(simpleSession.value, "base64").toString();
         const [email] = decoded.split(":");
-        if (email === "admin@impulsala.com") {
+        if (isAdminEmail(email)) {
           userEmail = email;
         }
       } catch {

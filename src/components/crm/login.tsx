@@ -74,7 +74,7 @@ export function CrmLogin() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@impulsala.com"
+                  placeholder="vlargagomez@gmail.com"
                   className="w-full pl-10 pr-3 py-2.5 bg-background/60 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition"
                   autoComplete="email"
                 />

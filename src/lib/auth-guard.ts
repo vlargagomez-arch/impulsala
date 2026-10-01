@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { ADMIN_EMAIL, isAdminEmail } from "@/lib/admin-email";
 import { headers } from "next/headers";
 
 /**
@@ -44,7 +45,7 @@ function checkSimpleSession(cookieValue: string): boolean {
   try {
     const decoded = Buffer.from(cookieValue, "base64").toString();
     const [email] = decoded.split(":");
-    return email === "admin@impulsala.com";
+    return isAdminEmail(email);
   } catch {
     return false;
   }
@@ -55,7 +56,7 @@ function createSuccessSession() {
     ok: true as const,
     session: {
       user: {
-        email: "admin@impulsala.com",
+        email: ADMIN_EMAIL,
         name: "Administrador",
         role: "admin",
         id: "admin-fallback",

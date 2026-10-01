@@ -29,7 +29,7 @@ const readIf = (p) => (fs.existsSync(p) ? fs.readFileSync(p, "utf8").trim() : ""
 const dbUrl = () => process.env.DATABASE_URL || readIf(path.join(ROOT, ".dburl"));
 const ghToken = () => readIf(path.join(ROOT, ".vtok"));
 const cronSecret = () => readIf(CRON_SECRET_FILE);
-const adminCookie = `nexus-admin-session=${Buffer.from("admin@impulsala.com:1").toString("base64")}`;
+const adminCookie = `nexus-admin-session=${Buffer.from("vlargagomez@gmail.com:1").toString("base64")}`;
 
 const sh = (cmd, args, opts = {}) => {
   const common = { cwd: ROOT, encoding: "utf8", stdio: "pipe", ...opts };

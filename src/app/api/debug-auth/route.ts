@@ -1,3 +1,4 @@
+import { isAdminEmail } from "@/lib/admin-email";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 
@@ -35,6 +36,6 @@ export async function GET(req: NextRequest) {
     nexusCookie: nexusCookie ? `${nexusCookie.substring(0, 30)}...` : null,
     decoded,
     email,
-    isAuthorized: email === "admin@impulsala.com",
+    isAuthorized: isAdminEmail(email),
   });
 }
