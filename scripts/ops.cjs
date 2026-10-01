@@ -24,11 +24,13 @@ const CRON_SECRET_FILE = path.join(
   os.homedir(),
   "AppData/Local/hermes/cache/scratch/impulsala-cron-secret.txt"
 );
+// El scratch de Hermes se poda a las 24 h: la copia de verdad vive en el repo (.cronsecret, gitignored).
+const CRON_SECRET_LOCAL = path.join(ROOT, ".cronsecret");
 
 const readIf = (p) => (fs.existsSync(p) ? fs.readFileSync(p, "utf8").trim() : "");
 const dbUrl = () => process.env.DATABASE_URL || readIf(path.join(ROOT, ".dburl"));
 const ghToken = () => readIf(path.join(ROOT, ".vtok"));
-const cronSecret = () => readIf(CRON_SECRET_FILE);
+const cronSecret = () => readIf(CRON_SECRET_LOCAL) || readIf(CRON_SECRET_FILE);
 const adminCookie = `nexus-admin-session=${Buffer.from("vlargagomez@gmail.com:1").toString("base64")}`;
 
 const sh = (cmd, args, opts = {}) => {

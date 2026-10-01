@@ -5,6 +5,7 @@ node_modules/
 .vtok
 .dburl
 .dburl2.tmp
+.cronsecret
 .cronsecret.tmp
 .env
 .env.local
