@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { ADMIN_EMAIL, isAdminEmail } from "@/lib/admin-email";
+import { ADMIN_EMAIL, isAdminEmail, isAdminPassword } from "@/lib/admin-email";
 
 /**
  * POST /api/login-direct
@@ -10,9 +10,8 @@ export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json();
 
-    const ADMIN_PASSWORD = process.env.CRM_ADMIN_PASSWORD || "Globe$12$3";
 
-    if (isAdminEmail(email) && password === ADMIN_PASSWORD) {
+    if (isAdminEmail(email) && isAdminPassword(password)) {
       const sessionId = Buffer.from(`${email}:${Date.now()}`).toString("base64");
 
       const response = NextResponse.json({

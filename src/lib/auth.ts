@@ -2,7 +2,7 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
-import { ADMIN_EMAIL } from "@/lib/admin-email";
+import { ADMIN_EMAIL, isAdminEmail, isAdminPassword } from "@/lib/admin-email";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -29,7 +29,7 @@ export const authOptions: NextAuthOptions = {
 
         // Si las credenciales coinciden con las hardcoded, permitir login directo
         // (sin tocar la BD que puede no estar disponible)
-        if (email === defaultEmail.toLowerCase() && password === defaultPassword) {
+        if (isAdminEmail(email) && isAdminPassword(password)) {
           console.log("✅ [AUTH] Login directo con credenciales hardcoded (BD skip)");
           return {
             id: "admin-fallback",
@@ -90,7 +90,7 @@ export const authOptions: NextAuthOptions = {
           console.error("❌ [AUTH] BD Error:", dbError?.message);
 
           // Último recurso: si la BD falla pero las credenciales son las hardcoded
-          if (email === defaultEmail.toLowerCase() && password === defaultPassword) {
+          if (isAdminEmail(email) && isAdminPassword(password)) {
             console.log("✅ [AUTH] Login fallback (BD rota pero credenciales OK)");
             return {
               id: "admin-fallback",
