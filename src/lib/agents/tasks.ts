@@ -287,7 +287,122 @@ Máximo 260 palabras. No uses markdown, solo HTML.`,
   return { task: "report", ok: true, detail: `Reporte enviado (${leads7.length} leads, ${citas7.length} citas)`, extra: { leads7: leads7.length } };
 }
 
-export const TAREAS = ["blog", "followup", "report"] as const;
+/* --------------------- RESUMEN DIARIO POR CORREO ------------------------ */
+
+const ICONO_CAT: Record<string, string> = {
+  "IA y Chatbots": "🤖",
+  "SEO Orgánico": "🔍",
+  "Ads y Performance": "📈",
+  "Automatización": "⚙️",
+  "Nuevas tecnologías": "🚀",
+  "Desarrollo Software": "💻",
+  "Marketing Digital": "✨",
+};
+
+/**
+ * Resumen diario para el dueño: qué hicieron HOY los agentes, con la portada
+ * real de cada artículo publicado. Sin IA: son los datos tal cual quedaron en la BD.
+ */
+async function taskDaily(): Promise<TaskResult> {
+  const desde = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const SITE = "https://impulsala.vercel.app";
+
+  const [articulos, conversaciones, leads, citas, correos, runs] = await Promise.all([
+    db.blogArticle.findMany({ where: { createdAt: { gte: desde } }, orderBy: { createdAt: "desc" } }),
+    db.agentLog.count({ where: { role: "user", createdAt: { gte: desde } } }).catch(() => 0),
+    db.bookingLead.findMany({ where: { createdAt: { gte: desde } }, orderBy: { createdAt: "desc" } }),
+    db.appointment.count({ where: { createdAt: { gte: desde } } }).catch(() => 0),
+    db.followUp.count({ where: { createdAt: { gte: desde } } }).catch(() => 0),
+    db.agentRun.findMany({ where: { createdAt: { gte: desde } }, orderBy: { createdAt: "desc" } }).catch(() => []),
+  ]);
+
+  const fecha = new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
+  const porAgente: Record<string, string[]> = {};
+  for (const r of runs) {
+    const nombre = r.agent === "prospect" ? "Prospectador" : r.agent === "blog" ? "SEO / Publicador" : r.agent === "followup" ? "Seguimiento" : r.agent === "report" ? "Analista" : r.agent === "chat" ? "Chat de ventas" : r.agent;
+    (porAgente[nombre] ||= []).push(`${r.status === "ok" ? "✅" : "⚠️"} ${r.summary || "sin detalle"}`);
+  }
+
+  const tarjetas = articulos
+    .map((a) => {
+      const img = `${SITE}/api/blog/cover?slug=${encodeURIComponent(a.slug)}&title=${encodeURIComponent(a.title)}&cat=${encodeURIComponent(a.category)}`;
+      const icono = ICONO_CAT[a.category] || "✨";
+      return `<div style="border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;margin:0 0 18px">
+        <img src="${img}" alt="${a.title}" width="600" style="width:100%;max-width:600px;display:block" />
+        <div style="padding:14px 16px">
+          <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6b7280">${icono} ${a.category}</div>
+          <div style="font-size:17px;font-weight:700;color:#111827;margin:6px 0 8px">${a.title}</div>
+          <div style="font-size:13px;color:#4b5563;line-height:1.5">${a.excerpt}</div>
+          <a href="${SITE}/blog/${a.slug}" style="display:inline-block;margin-top:12px;background:#7c3aed;color:#fff;text-decoration:none;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600">Leer el artículo →</a>
+        </div>
+      </div>`;
+    })
+    .join("");
+
+  const filasAgentes = Object.entries(porAgente)
+    .map(
+      ([nombre, items]) => `<tr>
+        <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:13px;vertical-align:top">${nombre}</td>
+        <td style="padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:13px;color:#374151">${items.map((i) => i.replace(/</g, "&lt;")).join("<br>")}</td>
+      </tr>`,
+    )
+    .join("");
+
+  const leadsLista = leads.length
+    ? `<ul style="margin:8px 0 0 18px;padding:0;font-size:13px;color:#374151">${leads
+        .slice(0, 10)
+        .map((l) => `<li>${l.name || "sin nombre"} · ${l.phone || l.email || "sin contacto"} · ${l.source || "sin origen"}</li>`)
+        .join("")}</ul>`
+    : `<p style="font-size:13px;color:#6b7280;margin:8px 0 0">Ningún lead nuevo hoy.</p>`;
+
+  const html = `<div style="font-family:system-ui,Segoe UI,Arial,sans-serif;max-width:640px;color:#111827;line-height:1.6">
+    <div style="background:linear-gradient(135deg,#7c3aed,#0ea5e9);border-radius:16px;padding:22px 24px;color:#fff;margin-bottom:20px">
+      <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.9">Resumen diario</div>
+      <div style="font-size:24px;font-weight:800;margin-top:4px">Esto hicieron tus agentes hoy</div>
+      <div style="font-size:13px;opacity:.95;margin-top:6px">${fecha} · Impulsala</div>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:22px">
+      <tr>
+        <td style="padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;text-align:center"><div style="font-size:22px;font-weight:800">${conversaciones}</div><div style="font-size:11px;color:#6b7280;text-transform:uppercase">Mensajes al chat</div></td>
+        <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:center"><div style="font-size:22px;font-weight:800">${leads.length}</div><div style="font-size:11px;color:#6b7280;text-transform:uppercase">Leads nuevos</div></td>
+        <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:center"><div style="font-size:22px;font-weight:800">${citas}</div><div style="font-size:11px;color:#6b7280;text-transform:uppercase">Citas</div></td>
+        <td style="padding:10px 12px;border:1px solid #e5e7eb;text-align:center"><div style="font-size:22px;font-weight:800">${articulos.length}</div><div style="font-size:11px;color:#6b7280;text-transform:uppercase">Artículos</div></td>
+      </tr>
+    </table>
+
+    ${filasAgentes ? `<h2 style="font-size:16px;margin:0 0 6px">Trabajo de cada agente (últimas 24 h)</h2><table style="width:100%;border-collapse:collapse;margin-bottom:22px">${filasAgentes}</table>` : `<p style="font-size:13px;color:#6b7280">Sin corridas registradas en las últimas 24 h.</p>`}
+
+    ${articulos.length ? `<h2 style="font-size:16px;margin:0 0 12px">Publicado hoy en el blog</h2>${tarjetas}` : ""}
+
+    <h2 style="font-size:16px;margin:0 0 6px">Leads del día</h2>
+    ${leadsLista}
+    <p style="font-size:13px;color:#6b7280;margin-top:8px">Correos de seguimiento escritos hoy: <strong>${correos}</strong></p>
+
+    <p style="font-size:12px;color:#9ca3af;margin-top:24px;border-top:1px solid #eee;padding-top:12px">
+      Generado automáticamente por tus agentes de Impulsala · <a href="${SITE}/crm" style="color:#7c3aed">Abrir el CRM</a> · WhatsApp ${BUSINESS.whatsapp}
+    </p>
+  </div>`;
+
+  const texto = `Resumen diario de Impulsala (${fecha})\nMensajes al chat: ${conversaciones}\nLeads nuevos: ${leads.length}\nCitas: ${citas}\nArtículos publicados: ${articulos.length}\nCorreos de seguimiento: ${correos}\n\n${articulos.map((a) => `Artículo: ${a.title} → ${SITE}/blog/${a.slug}`).join("\n")}`;
+
+  await sendEmail({
+    to: TEAM_EMAIL,
+    subject: `☀️ Resumen diario de Impulsala — ${runs.length} acciones de tus agentes, ${articulos.length} artículo(s)`,
+    html,
+    text: texto,
+    replyTo: TEAM_EMAIL,
+  });
+
+  return {
+    task: "daily",
+    ok: true,
+    detail: `Resumen diario enviado a ${TEAM_EMAIL} (${conversaciones} mensajes, ${leads.length} leads, ${articulos.length} artículos, ${runs.length} acciones)`,
+    extra: { conversaciones, leads: leads.length, citas, articulos: articulos.length, correos, acciones: runs.length },
+  };
+}
+
+export const TAREAS = ["blog", "followup", "report", "daily"] as const;
 export type Tarea = (typeof TAREAS)[number];
 
 export type RunOutcome = { ok: true; result: TaskResult; ms: number } | { ok: false; error: string; ms: number };
@@ -312,7 +427,8 @@ export async function runTaskSafe(task: Tarea, opts?: { conReporte?: boolean }):
           extra: { followup: result.extra, report: reporte },
         };
       }
-    } else result = await taskReport();
+    } else if (task === "daily") result = await taskDaily();
+    else result = await taskReport();
 
     const ms = Date.now() - started;
     await logRun(task, "ok", result.detail, ms, result.extra);

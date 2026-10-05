@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth-guard";
+import { db } from "@/lib/db";
 import { searchBusinesses, enrichEmails, type RealBusiness } from "@/lib/prospect-maps";
 
 /**
@@ -182,6 +183,7 @@ export async function POST(req: NextRequest) {
   if (!guard.ok) return guard.response;
 
   try {
+    const t0 = Date.now();
     const {
       query,
       location = "Bogotá, Colombia",
@@ -255,6 +257,19 @@ export async function POST(req: NextRequest) {
     console.log(
       `✅ [PROSPECCION] ${prospects.length} negocios reales en ${search.city} (${search.scanned} escaneados en el mapa)`,
     );
+
+    // Se registra la corrida para que el resumen diario por correo la incluya.
+    await db.agentRun
+      .create({
+        data: {
+          agent: "prospect",
+          status: "ok",
+          summary: `${prospects.length} negocios reales de "${query}" en ${search.city} (${search.scanned} escaneados). Con teléfono: ${prospects.filter((p) => p.phone).length}, con correo: ${prospects.filter((p) => p.email).length}.`,
+          durationMs: Date.now() - t0,
+          meta: JSON.stringify({ query, location, city: search.city, scanned: search.scanned, nombres: prospects.map((p) => p.businessName) }).slice(0, 8000),
+        },
+      })
+      .catch((e) => console.error("[PROSPECCION] no se pudo registrar la corrida:", e?.message));
 
     return NextResponse.json({
       prospects,
