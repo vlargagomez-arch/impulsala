@@ -106,6 +106,19 @@ export async function POST(req: NextRequest) {
             meta: JSON.stringify(result.steps).slice(0, 8000),
           },
         });
+      } else {
+        // Sin herramientas igual se registra: el panel del CRM debe mostrar que
+        // el agente de ventas está trabajando, y qué le preguntó el visitante.
+        await db.agentRun.create({
+          data: {
+            agent: "chat",
+            status: "ok",
+            summary: `Visitante: "${message.slice(0, 90)}${message.length > 90 ? "…" : ""}" → respondido`,
+            tokens: result.tokens,
+            durationMs: Date.now() - started,
+            meta: JSON.stringify({ conversationId, page: body.page || null }).slice(0, 2000),
+          },
+        });
       }
     } catch (logErr) {
       console.error("[agentes] log falló:", logErr);

@@ -52,10 +52,12 @@ export async function GET(req: NextRequest) {
       motor: hasDeepSeekKey() ? "DeepSeek conectado" : "Falta DEEPSEEK_API_KEY",
       whatsapp: `+${BUSINESS.whatsapp}`,
       agentes: [
-        { id: "chat", nombre: "Agente de ventas 24/7", detalle: "Atiende el chat de la web, califica y agenda citas", activo: hasDeepSeekKey() },
-        { id: "blog", nombre: "Agente SEO", detalle: "Publica un artículo optimizado cada día", activo: hasDeepSeekKey() },
-        { id: "followup", nombre: "Agente de seguimiento", detalle: "Escribe y envía correos a leads nuevos", activo: hasDeepSeekKey() },
-        { id: "report", nombre: "Agente analista", detalle: "Reporte semanal con cifras y acciones (lunes)", activo: hasDeepSeekKey() },
+        { id: "chat", nombre: "Agente de ventas 24/7", detalle: "Atiende el chat de la web, califica y agenda citas", horario: "siempre encendido", activo: hasDeepSeekKey() },
+        { id: "blog", nombre: "Agente SEO", detalle: "Publica un artículo optimizado cada día", horario: "todos los días · 2:00 p.m.", activo: hasDeepSeekKey() },
+        { id: "prospect", nombre: "Agente prospectador", detalle: "Busca negocios reales en el mapa, saca su correo y te manda la lista para contactar", horario: "todos los días · 12:00 m.", activo: hasDeepSeekKey() },
+        { id: "followup", nombre: "Agente de seguimiento", detalle: "Escribe y envía correos a leads nuevos", horario: "todos los días · 1:00 p.m.", activo: hasDeepSeekKey() },
+        { id: "report", nombre: "Agente analista", detalle: "Reporte semanal con cifras y acciones", horario: "lunes · 1:30 p.m.", activo: hasDeepSeekKey() },
+        { id: "daily", nombre: "Resumen diario por correo", detalle: "Te manda a tu correo todo lo que hicieron los agentes", horario: "todos los días · 7:00 p.m.", activo: hasDeepSeekKey() },
       ],
     },
     metricas: {

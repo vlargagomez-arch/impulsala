@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { askJson, askOnce } from "@/lib/agents/deepseek";
 import { knowledgeDigest, BUSINESS } from "@/lib/agents/knowledge";
 import { sendEmail } from "@/lib/email-sender";
+import { searchBusinesses, enrichEmails } from "@/lib/prospect-maps";
 import { TEAM_EMAIL } from "@/lib/agents/tools";
 
 /**
@@ -402,7 +403,92 @@ async function taskDaily(): Promise<TaskResult> {
   };
 }
 
-export const TAREAS = ["blog", "followup", "report", "daily"] as const;
+/* ------------------ PROSPECTOR: BUSCA CLIENTES REALES -------------------- */
+
+/** Un combo por día de la semana (rota solo, sin repetir ciudad cada semana). */
+const ROTACION_PROSPECCION: { categoria: string; ciudad: string; servicio: string }[] = [
+  { categoria: "restaurantes", ciudad: "Bogotá, Colombia", servicio: "Landing web + SEO local" },
+  { categoria: "gimnasios", ciudad: "Medellín, Colombia", servicio: "Web + automatización de reservas" },
+  { categoria: "peluquerías", ciudad: "Cali, Colombia", servicio: "Landing + agenda con IA" },
+  { categoria: "veterinarias", ciudad: "Barranquilla, Colombia", servicio: "Web + agente de citas" },
+  { categoria: "hoteles", ciudad: "Cartagena, Colombia", servicio: "Web + chat 24/7" },
+  { categoria: "inmobiliarias", ciudad: "Bucaramanga, Colombia", servicio: "Landing + captación de leads" },
+  { categoria: "odontologos", ciudad: "Pereira, Colombia", servicio: "Web + Google Ads" },
+];
+
+function waLink(tel: string): string {
+  const d = tel.replace(/[^\d]/g, "");
+  return d ? `https://wa.me/${d.length === 10 ? "57" + d : d}` : "";
+}
+
+/**
+ * Busca negocios REALES en el mapa (OpenStreetMap), les rastrea el correo en su
+ * web y le manda la lista al dueño con el enlace de WhatsApp listo.
+ */
+async function taskProspect(): Promise<TaskResult> {
+  const combo = ROTACION_PROSPECCION[Math.floor(Date.now() / 86_400_000) % ROTACION_PROSPECCION.length];
+
+  const search = await searchBusinesses(combo.categoria, combo.ciudad, 8);
+  const negocios = search.businesses;
+  if (!negocios.length) {
+    const aviso = search.degraded
+      ? "Los servidores públicos del mapa están saturados en este momento (no es que no haya negocios)."
+      : `No se encontraron ${combo.categoria} con datos de contacto en ${combo.ciudad}.`;
+    await logRun("prospect", "error", aviso, 0).catch(() => null);
+    return { task: "prospect", ok: false, detail: aviso };
+  }
+
+  await enrichEmails(negocios, 8).catch(() => null);
+
+  const filas = negocios
+    .map((b) => {
+      const wa = b.phone ? waLink(b.phone) : "";
+      return `<tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top">
+          <div style="font-size:14px;font-weight:700">${b.name}</div>
+          <div style="font-size:12px;color:#6b7280">${b.address || search.city}</div>
+          <div style="font-size:12px;color:#374151;margin-top:4px">${b.phone ? "📞 " + b.phone : "sin teléfono"}${b.email ? " · ✉️ " + b.email : ""}</div>
+          ${b.website ? `<div style="font-size:11px;color:#9ca3af;margin-top:2px">web: ${b.website}</div>` : ""}
+        </td>
+        <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top;white-space:nowrap">
+          ${wa ? `<a href="${wa}" style="background:#25D366;color:#fff;text-decoration:none;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:600">WhatsApp</a>` : ""}
+        </td>
+      </tr>`;
+    })
+    .join("");
+
+  const conTel = negocios.filter((b) => b.phone).length;
+  const conCorreo = negocios.filter((b) => b.email).length;
+  const servicio = combo.servicio;
+
+  await sendEmail({
+    to: TEAM_EMAIL,
+    subject: `🔎 Prospectador: ${negocios.length} ${combo.categoria} en ${search.city} para contactar hoy`,
+    html: `<div style="font-family:system-ui,Segoe UI,Arial,sans-serif;max-width:640px;color:#111827">
+      <div style="background:linear-gradient(135deg,#7c3aed,#0ea5e9);border-radius:16px;padding:20px 22px;color:#fff;margin-bottom:18px">
+        <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.9">Agente prospectador</div>
+        <div style="font-size:22px;font-weight:800;margin-top:4px">${negocios.length} negocios reales para contactar</div>
+        <div style="font-size:13px;opacity:.95;margin-top:6px">${combo.categoria} · ${search.city} · ${search.scanned} negocios revisados en el mapa</div>
+      </div>
+      <p style="font-size:13px;color:#374151">Servicio sugerido para este grupo: <strong>${servicio}</strong>. Los datos salen del mapa abierto (OpenStreetMap); el correo, cuando aparece, lo saqué de la web del propio negocio.</p>
+      <table style="width:100%;border-collapse:collapse">${filas}</table>
+      <p style="font-size:12px;color:#9ca3af;margin-top:20px">Generado por tus agentes de Impulsala · <a href="https://impulsala.vercel.app/crm" style="color:#7c3aed">Abrir el CRM</a></p>
+    </div>`,
+    text: `Prospectador: ${negocios.length} negocios de ${combo.categoria} en ${search.city}\n\n${negocios
+      .map((b) => `${b.name} — ${b.phone || "sin teléfono"}${b.email ? " · " + b.email : ""}${b.phone ? " · " + waLink(b.phone) : ""}`)
+      .join("\n")}`,
+    replyTo: TEAM_EMAIL,
+  });
+
+  return {
+    task: "prospect",
+    ok: true,
+    detail: `${negocios.length} negocios reales de ${combo.categoria} en ${search.city} (${conTel} con teléfono, ${conCorreo} con correo). Lista enviada a ${TEAM_EMAIL}.`,
+    extra: { categoria: combo.categoria, ciudad: search.city, escaneados: search.scanned, conTelefono: conTel, conCorreo },
+  };
+}
+
+export const TAREAS = ["blog", "followup", "report", "daily", "prospect"] as const;
 export type Tarea = (typeof TAREAS)[number];
 
 export type RunOutcome = { ok: true; result: TaskResult; ms: number } | { ok: false; error: string; ms: number };
@@ -428,6 +514,7 @@ export async function runTaskSafe(task: Tarea, opts?: { conReporte?: boolean }):
         };
       }
     } else if (task === "daily") result = await taskDaily();
+    else if (task === "prospect") result = await taskProspect();
     else result = await taskReport();
 
     const ms = Date.now() - started;

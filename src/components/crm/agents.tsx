@@ -39,7 +39,7 @@ type Status = {
   estado: {
     motor: string;
     whatsapp: string;
-    agentes: { id: string; nombre: string; detalle: string; activo: boolean }[];
+    agentes: { id: string; nombre: string; detalle: string; horario?: string; activo: boolean }[];
   };
   metricas: {
     leads7d: number;
@@ -58,8 +58,10 @@ type Status = {
 const AGENT_LABEL: Record<string, string> = {
   chat: "Agente de ventas",
   blog: "Agente SEO",
+  prospect: "Agente prospectador",
   followup: "Agente de seguimiento",
   report: "Agente analista",
+  daily: "Resumen diario por correo",
 };
 
 function fmt(date: string) {
@@ -81,8 +83,10 @@ function haceCuanto(date: string | Date) {
 /** Qué agentes se pueden disparar a mano desde el panel. */
 const TAREA_POR_AGENTE: Record<string, string | undefined> = {
   blog: "blog",
+  prospect: "prospect",
   followup: "followup",
   report: "report",
+  daily: "daily",
 };
 
 export function CrmAgents() {
@@ -216,6 +220,9 @@ export function CrmAgents() {
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">{a.detalle}</p>
+                {a.horario && (
+                  <p className="mt-1 text-[11px] text-violet-300/80">🕒 {a.horario}</p>
+                )}
 
                 <div className="mt-2 flex items-center gap-2 text-[11px]">
                   {ultima ? (
