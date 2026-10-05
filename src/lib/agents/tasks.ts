@@ -387,7 +387,7 @@ async function taskDaily(): Promise<TaskResult> {
 
   const texto = `Resumen diario de Impulsala (${fecha})\nMensajes al chat: ${conversaciones}\nLeads nuevos: ${leads.length}\nCitas: ${citas}\nArtículos publicados: ${articulos.length}\nCorreos de seguimiento: ${correos}\n\n${articulos.map((a) => `Artículo: ${a.title} → ${SITE}/blog/${a.slug}`).join("\n")}`;
 
-  await sendEmail({
+  const envio = await sendEmail({
     to: TEAM_EMAIL,
     subject: `☀️ Resumen diario de Impulsala — ${runs.length} acciones de tus agentes, ${articulos.length} artículo(s)`,
     html,
@@ -395,11 +395,32 @@ async function taskDaily(): Promise<TaskResult> {
     replyTo: TEAM_EMAIL,
   });
 
+  // El correo es el entregable: si el SMTP falla, la corrida se marca como FALLIDA
+  // (antes quedaba como "enviado" aunque el correo nunca saliera).
+  if (!envio.success) {
+    return {
+      task: "daily",
+      ok: false,
+      detail: `No se pudo enviar el resumen diario a ${TEAM_EMAIL} · proveedor ${envio.provider}: ${envio.error || "error de correo"}`,
+      extra: { enviado: false, proveedor: envio.provider },
+    };
+  }
+
   return {
     task: "daily",
     ok: true,
     detail: `Resumen diario enviado a ${TEAM_EMAIL} (${conversaciones} mensajes, ${leads.length} leads, ${articulos.length} artículos, ${runs.length} acciones)`,
-    extra: { conversaciones, leads: leads.length, citas, articulos: articulos.length, correos, acciones: runs.length },
+    extra: {
+      enviado: true,
+      proveedor: envio.provider,
+      messageId: envio.messageId,
+      conversaciones,
+      leads: leads.length,
+      citas,
+      articulos: articulos.length,
+      correos,
+      acciones: runs.length,
+    },
   };
 }
 
@@ -518,6 +539,12 @@ export async function runTaskSafe(task: Tarea, opts?: { conReporte?: boolean }):
     else result = await taskReport();
 
     const ms = Date.now() - started;
+    // Una tarea puede terminar con result.ok = false sin lanzar (p. ej. el correo no salió):
+    // eso debe quedar registrado como error, no como corrida buena.
+    if (!result.ok) {
+      await logRun(task, "error", result.detail, ms, result.extra);
+      return { ok: false, error: result.detail, ms };
+    }
     await logRun(task, "ok", result.detail, ms, result.extra);
     return { ok: true, result, ms };
   } catch (err) {

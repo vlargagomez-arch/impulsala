@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth-guard";
 import { hasDeepSeekKey } from "@/lib/agents/deepseek";
 import { BUSINESS } from "@/lib/agents/knowledge";
+import { getEmailStatus } from "@/lib/email-sender";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -50,13 +51,17 @@ export async function GET(req: NextRequest) {
     ok: true,
     estado: {
       motor: hasDeepSeekKey() ? "DeepSeek conectado" : "Falta DEEPSEEK_API_KEY",
+      correo: (() => {
+        const e = getEmailStatus();
+        return { proveedor: e.providerLabel, configurado: e.configured, aviso: e.needsConfig };
+      })(),
       whatsapp: `+${BUSINESS.whatsapp}`,
       agentes: [
         { id: "chat", nombre: "Agente de ventas 24/7", detalle: "Atiende el chat de la web, califica y agenda citas", horario: "siempre encendido", activo: hasDeepSeekKey() },
-        { id: "blog", nombre: "Agente SEO", detalle: "Publica un artículo optimizado cada día", horario: "todos los días · 2:00 p.m.", activo: hasDeepSeekKey() },
-        { id: "prospect", nombre: "Agente prospectador", detalle: "Busca negocios reales en el mapa, saca su correo y te manda la lista para contactar", horario: "todos los días · 12:00 m.", activo: hasDeepSeekKey() },
-        { id: "followup", nombre: "Agente de seguimiento", detalle: "Escribe y envía correos a leads nuevos", horario: "todos los días · 1:00 p.m.", activo: hasDeepSeekKey() },
-        { id: "report", nombre: "Agente analista", detalle: "Reporte semanal con cifras y acciones", horario: "lunes · 1:30 p.m.", activo: hasDeepSeekKey() },
+        { id: "blog", nombre: "Agente SEO", detalle: "Publica un artículo optimizado cada día", horario: "todos los días · 9:00 a.m.", activo: hasDeepSeekKey() },
+        { id: "prospect", nombre: "Agente prospectador", detalle: "Busca negocios reales en el mapa, saca su correo y te manda la lista para contactar", horario: "a demanda, desde el CRM", activo: hasDeepSeekKey() },
+        { id: "followup", nombre: "Agente de seguimiento", detalle: "Escribe y envía correos a leads nuevos", horario: "todos los días · 8:00 a.m.", activo: hasDeepSeekKey() },
+        { id: "report", nombre: "Agente analista", detalle: "Reporte semanal con cifras y acciones", horario: "lunes · 8:00 a.m.", activo: hasDeepSeekKey() },
         { id: "daily", nombre: "Resumen diario por correo", detalle: "Te manda a tu correo todo lo que hicieron los agentes", horario: "todos los días · 7:00 p.m.", activo: hasDeepSeekKey() },
       ],
     },
