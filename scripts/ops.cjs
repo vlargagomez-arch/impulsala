@@ -82,7 +82,7 @@ async function status() {
   const chat = await json("/api/agents/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: "Hola, ¿qué servicios ofrecen?" }),
+    body: JSON.stringify({ message: "Hola, ¿qué servicios ofrecen?", healthcheck: true }),
   });
   console.log(
     `OK  agente chat: HTTP ${chat.status} · modelo=${chat.body.model || "-"} · respuesta="${String(chat.body.reply || chat.body.error || "").slice(0, 90)}..."`

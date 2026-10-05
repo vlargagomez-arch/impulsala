@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: { message?: string; history?: Turn[]; page?: string; context?: string; conversationId?: string };
+  let body: { message?: string; history?: Turn[]; page?: string; context?: string; conversationId?: string; healthcheck?: boolean };
   try {
     body = await req.json();
   } catch {
@@ -89,13 +89,19 @@ export async function POST(req: NextRequest) {
 
     // Registro de la conversación + herramientas usadas (para el panel del CRM)
     try {
-      await db.agentLog.createMany({
-        data: [
-          { conversationId, role: "user", content: message.slice(0, 2000) },
-          { conversationId, role: "agent", content: reply.slice(0, 4000) },
-        ],
-      });
-      if (result.steps.length) {
+      if (!body.healthcheck) {
+        await db.agentLog.createMany({
+          data: [
+            { conversationId, role: "user", content: message.slice(0, 2000) },
+            { conversationId, role: "agent", content: reply.slice(0, 4000) },
+          ],
+        });
+      } else {
+        console.log("[agentes/chat] chequeo de salud: no se registra como conversación");
+      }
+      if (body.healthcheck) {
+        // Los chequeos de salud no ensucian las métricas del panel.
+      } else if (result.steps.length) {
         await db.agentRun.create({
           data: {
             agent: "chat",
