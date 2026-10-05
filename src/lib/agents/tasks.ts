@@ -482,7 +482,7 @@ async function taskProspect(): Promise<TaskResult> {
   const conCorreo = negocios.filter((b) => b.email).length;
   const servicio = combo.servicio;
 
-  await sendEmail({
+  const envio = await sendEmail({
     to: TEAM_EMAIL,
     subject: `🔎 Prospectador: ${negocios.length} ${combo.categoria} en ${search.city} para contactar hoy`,
     html: `<div style="font-family:system-ui,Segoe UI,Arial,sans-serif;max-width:640px;color:#111827">
@@ -501,11 +501,20 @@ async function taskProspect(): Promise<TaskResult> {
     replyTo: TEAM_EMAIL,
   });
 
+  if (!envio.success) {
+    return {
+      task: "prospect",
+      ok: false,
+      detail: `${negocios.length} negocios encontrados en ${search.city} pero NO pude enviarte la lista a ${TEAM_EMAIL} (${envio.error || "error de correo"})`,
+      extra: { enviado: false, categoria: combo.categoria, ciudad: search.city, conTelefono: conTel, conCorreo },
+    };
+  }
+
   return {
     task: "prospect",
     ok: true,
     detail: `${negocios.length} negocios reales de ${combo.categoria} en ${search.city} (${conTel} con teléfono, ${conCorreo} con correo). Lista enviada a ${TEAM_EMAIL}.`,
-    extra: { categoria: combo.categoria, ciudad: search.city, escaneados: search.scanned, conTelefono: conTel, conCorreo },
+    extra: { enviado: true, categoria: combo.categoria, ciudad: search.city, escaneados: search.scanned, conTelefono: conTel, conCorreo },
   };
 }
 

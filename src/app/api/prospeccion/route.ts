@@ -42,7 +42,7 @@ const SITE = "https://impulsala.vercel.app";
 function recommendService(b: RealBusiness): Prospect["recommendedService"] {
   if (!b.website) return "web";
   const heavyOps = /clínic|restaurant|cafeter|hotel|salón|taller|gimnasio|veterinar|inmobiliar/i.test(
-    b.categoryLabel,
+    b.categoryLabel || "negocio",
   );
   return heavyOps ? "ia" : "seo";
 }
@@ -64,7 +64,7 @@ function snippetOf(b: RealBusiness, city: string): string {
     b.website ? `web registrada: ${b.website}` : "sin web registrada en el mapa",
     b.email ? "correo en el mapa" : null,
   ].filter(Boolean);
-  return `${b.categoryLabel} en ${city}. Datos en OpenStreetMap: ${datos.join(", ")}.`;
+  return `${b.categoryLabel || "Negocios"} en ${city}. Datos en OpenStreetMap: ${datos.join(", ")}.`;
 }
 
 /** Propuesta local (sin LLM) usando SOLO los datos reales del negocio. */
@@ -84,7 +84,7 @@ function localProposal(
     : `No encontré una página web registrada para ustedes. Si ya tienen una, me lo dicen y lo ajusto; si no, es justo por donde están perdiendo clientes.`;
   const proposal = `Hola, equipo de ${b.name}:
 
-Les escribo de Impulsala, agencia digital en Colombia. Estoy revisando ${b.categoryLabel.toLowerCase()}s en ${city} y su negocio me pareció un buen candidato para ${servicio}.
+Les escribo de Impulsala, agencia digital en Colombia. Estoy revisando ${(b.categoryLabel || "negocios").toLowerCase()}s en ${city} y su negocio me pareció un buen candidato para ${servicio}.
 
 ${webLine}
 
@@ -93,7 +93,7 @@ ${webLine}
 Quedo atento,
 Equipo Impulsala`;
   return {
-    subject: `Propuesta para ${b.name} (${b.categoryLabel.toLowerCase()})`.slice(0, 60),
+    subject: `Propuesta para ${b.name} (${(b.categoryLabel || "negocios").toLowerCase()})`.slice(0, 60),
     proposal,
   };
 }
@@ -114,7 +114,7 @@ async function generateProposals(
   const payload = businesses.map((b, i) => ({
     i,
     negocio: b.name,
-    tipo: b.categoryLabel,
+    tipo: b.categoryLabel || "negocio",
     ciudad: city,
     direccion: b.address,
     telefono: b.phone,
@@ -219,7 +219,7 @@ export async function POST(req: NextRequest) {
         provider: "openstreetmap",
         source: "OpenStreetMap (ODbL)",
         city: search.city,
-        categoryLabel: search.categoryLabel,
+        categoryLabel: search.categoryLabel || "negocio",
         scanned: search.scanned,
         message: search.degraded
           ? "Los servidores públicos de mapas (OpenStreetMap) están saturados en este momento. Esperá un minuto y reintentá la misma búsqueda."
@@ -277,7 +277,7 @@ export async function POST(req: NextRequest) {
       query,
       location,
       city: search.city,
-      categoryLabel: search.categoryLabel,
+      categoryLabel: search.categoryLabel || "negocio",
       scanned: search.scanned,
       provider: "openstreetmap",
       source: "OpenStreetMap (ODbL)",
