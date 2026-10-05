@@ -9,6 +9,22 @@ import { NextRequest } from "next/server";
 
 export const runtime = "edge";
 
+/** Inter (subset latin, incluye tildes y ñ) para que los títulos no salgan con "?". */
+async function fuentes() {
+  try {
+    const [w400, w800] = await Promise.all([
+      fetch("https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-400-normal.woff").then((r) => r.arrayBuffer()),
+      fetch("https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-800-normal.woff").then((r) => r.arrayBuffer()),
+    ]);
+    return [
+      { name: "Inter", data: w400, weight: 400 as const, style: "normal" as const },
+      { name: "Inter", data: w800, weight: 800 as const, style: "normal" as const },
+    ];
+  } catch {
+    return undefined;
+  }
+}
+
 const PALETA: Record<string, { from: string; to: string; icono: string }> = {
   "IA y Chatbots": { from: "#10b981", to: "#0ea5e9", icono: "🤖" },
   "SEO Orgánico": { from: "#10b981", to: "#059669", icono: "🔍" },
