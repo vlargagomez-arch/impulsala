@@ -162,6 +162,15 @@ model AgentRun {
   @@index([createdAt])
 }
 
+model AgentSetting {
+  agent     String   @id // chat | blog | followup | report | daily | prospect
+  enabled   Boolean  @default(true)
+  note      String?
+  updatedAt DateTime @updatedAt
+
+  @@map("AgentSetting")
+}
+
 model AgentLog {
   id             String   @id @default(cuid())
   conversationId String?

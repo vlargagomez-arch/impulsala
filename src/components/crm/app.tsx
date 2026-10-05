@@ -4,6 +4,8 @@ import { useState } from "react";
 import {
   LayoutDashboard,
   Trello,
+  Bot,
+  Power,
   Calendar,
   Mail,
   Send,
@@ -23,8 +25,9 @@ import { CrmNewsletter } from "./newsletter";
 import { CrmCampaigns } from "./campaigns";
 import { CrmBlog } from "./blog";
 import { CrmProspeccion } from "./prospeccion";
+import { CrmAgentesControl } from "./agentes-control";
 
-type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "prospeccion" | "blog";
+type Tab = "dashboard" | "leads" | "appointments" | "newsletter" | "campaigns" | "prospeccion" | "agentes" | "blog";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -62,6 +65,12 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode; description: string 
     label: "Prospección IA",
     icon: <Target className="w-4 h-4" />,
     description: "Buscá negocios con IA y generá propuestas automáticas",
+  },
+  {
+    id: "agentes",
+    label: "Agentes IA",
+    icon: <Power className="w-4 h-4" />,
+    description: "Prende y apaga cada agente cuando tú decidas",
   },
   {
     id: "blog",
@@ -209,6 +218,7 @@ export function CrmApp({ userEmail }: { userEmail: string }) {
           {tab === "newsletter" && <CrmNewsletter />}
           {tab === "campaigns" && <CrmCampaigns />}
           {tab === "prospeccion" && <CrmProspeccion />}
+          {tab === "agentes" && <CrmAgentesControl />}
           {tab === "blog" && <CrmBlog />}
         </main>
       </div>

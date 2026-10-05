@@ -4,6 +4,7 @@ import { knowledgeDigest, BUSINESS } from "@/lib/agents/knowledge";
 import { sendEmail } from "@/lib/email-sender";
 import { searchBusinesses, enrichEmails } from "@/lib/prospect-maps";
 import { TEAM_EMAIL } from "@/lib/agents/tools";
+import { agenteEncendido, NOMBRE_AGENTE } from "@/lib/agents/switches";
 
 /**
  * Tareas de los agentes IA de Impulsala. Aquí vive la lógica; la ejecutan
@@ -529,6 +530,15 @@ export type RunOutcome = { ok: true; result: TaskResult; ms: number } | { ok: fa
  */
 export async function runTaskSafe(task: Tarea, opts?: { conReporte?: boolean }): Promise<RunOutcome> {
   const started = Date.now();
+
+  // El dueño manda: si el agente está apagado, no trabaja (ni por cron ni a mano).
+  if (!(await agenteEncendido(task))) {
+    const ms = Date.now() - started;
+    const error = `${NOMBRE_AGENTE[task] || task} está APAGADO. Enciéndelo para que trabaje.`;
+    await logRun(task, "apagado", error, ms);
+    return { ok: false, error, ms };
+  }
+
   try {
     let result: TaskResult;
     if (task === "blog") result = await taskBlog();

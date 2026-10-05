@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { hasDeepSeekKey, DeepSeekError } from "@/lib/agents/deepseek";
 import { runAgent, toHistory } from "@/lib/agents/runner";
 import { knowledgeDigest, GUARDRAILS, BUSINESS } from "@/lib/agents/knowledge";
+import { agenteEncendido } from "@/lib/agents/switches";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -51,6 +52,18 @@ export async function POST(req: NextRequest) {
   if (!hasDeepSeekKey()) {
     return NextResponse.json(
       { ok: false, reply: `Estoy en mantenimiento técnico. Escríbenos al WhatsApp +${BUSINESS.whatsapp} y te atendemos ya.`, error: "missing_key" },
+      { status: 200 },
+    );
+  }
+
+  // El dueño decide cuándo trabaja: si apagó el agente de ventas, el widget no contesta con IA.
+  if (!(await agenteEncendido("chat"))) {
+    return NextResponse.json(
+      {
+        ok: false,
+        apagado: true,
+        reply: `En este momento no estamos disponibles en el chat. Escríbenos al WhatsApp +${BUSINESS.whatsapp} y te atendemos ya mismo.`,
+      },
       { status: 200 },
     );
   }
