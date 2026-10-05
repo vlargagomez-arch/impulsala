@@ -428,7 +428,7 @@ function waLink(tel: string): string {
 async function taskProspect(): Promise<TaskResult> {
   const combo = ROTACION_PROSPECCION[Math.floor(Date.now() / 86_400_000) % ROTACION_PROSPECCION.length];
 
-  const search = await searchBusinesses(combo.categoria, combo.ciudad, 8);
+  const search = await searchBusinesses({ category: combo.categoria, location: combo.ciudad, limit: 8 });
   const negocios = search.businesses;
   if (!negocios.length) {
     const aviso = search.degraded
