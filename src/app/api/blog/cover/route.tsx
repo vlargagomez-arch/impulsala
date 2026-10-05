@@ -56,15 +56,23 @@ export async function GET(req: NextRequest) {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
-          <div style={{ fontSize: 54 }}>{pal.icono}</div>
+          <div
+            style={{
+              display: "flex",
+              width: 56,
+              height: 8,
+              borderRadius: 4,
+              background: "rgba(255,255,255,0.95)",
+            }}
+          />
           <div
             style={{
               display: "flex",
               fontSize: 26,
               fontWeight: 600,
-              letterSpacing: 1,
+              letterSpacing: 3,
               textTransform: "uppercase",
-              opacity: 0.92,
+              opacity: 0.95,
             }}
           >
             {category}
