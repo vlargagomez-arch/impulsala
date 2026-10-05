@@ -347,6 +347,62 @@ export async function enrichEmails(businesses: RealBusiness[], maxSitios = 10): 
 const searchCache = new Map<string, { at: number; result: SearchResult }>();
 const CACHE_TTL_MS = 10 * 60 * 1000;
 
+/** Plan B cuando Overpass está saturado: buscar los negocios en Nominatim
+ *  (mismo OpenStreetMap, otro servicio). Solo se usa si los mirrors fallaron. */
+async function nominatimPlaces(
+  category: string,
+  city: string,
+  lat: number,
+  lon: number,
+): Promise<RealBusiness[]> {
+  const q = `${category} ${city}`.replace(/\s+/g, " ").trim();
+  const d = 0.35; // ~35 km de ventana alrededor del centro de la ciudad
+  const url =
+    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}` +
+    `&format=jsonv2&limit=30&extratags=1&addressdetails=1&countrycodes=co` +
+    `&viewbox=${lon - d},${lat + d},${lon + d},${lat - d}&bounded=1`;
+
+  const res = await fetch(url, {
+    headers: { "User-Agent": UA, "Accept-Language": "es" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(12_000),
+  });
+  if (!res.ok) throw new Error(`Nominatim ${res.status}`);
+  const arr = (await res.json()) as any[];
+  if (!Array.isArray(arr)) return [];
+
+  const malos = new Set(["place", "boundary", "highway", "railway", "waterway", "natural", "landuse"]);
+  const out: RealBusiness[] = [];
+  const vistos = new Set<string>();
+  for (const r of arr) {
+    if (!r || malos.has(String(r.class))) continue;
+    const nombre = String(r.name || r.display_name?.split(",")[0] || "").trim();
+    if (!nombre) continue;
+    const clave = normalizeName(nombre);
+    if (vistos.has(clave)) continue;
+    const la = Number(r.lat);
+    const lo = Number(r.lon);
+    if (!Number.isFinite(la) || !Number.isFinite(lo)) continue;
+    if (distanciaM(lat, lon, la, lo) > 40_000) continue;
+    vistos.add(clave);
+    const ex = (r.extratags || {}) as Record<string, string>;
+    out.push({
+      name: nombre.slice(0, 120),
+      categoryLabel: category,
+      address: r.display_name ? String(r.display_name).split(",").slice(0, 3).join(", ") : null,
+      phone: pick(ex, ["phone", "contact:phone", "contact:mobile", "mobile"]),
+      website: pick(ex, ["website", "contact:website", "url"]),
+      email: pick(ex, ["email", "contact:email"]),
+      lat: la,
+      lon: lo,
+      osmUrl: `https://www.openstreetmap.org/${r.osm_type || "node"}/${r.osm_id}`,
+      mapUrl: `https://www.google.com/maps/search/?api=1&query=${la},${lo}`,
+    });
+  }
+  out.sort((a, b) => (b.phone ? 2 : 0) + (b.address ? 1 : 0) - ((a.phone ? 2 : 0) + (a.address ? 1 : 0)));
+  return out;
+}
+
 /**
  * Busca negocios reales de una categoría en una ciudad.
  * Devuelve SOLO lo que existe en el mapa, con la fuente incluida.
@@ -396,6 +452,28 @@ export async function searchBusinesses(opts: {
     if (nombres() >= limit) break;
   }
   const degraded = !algunaOk;
+
+  // Plan B: si los mirrors de Overpass fallaron, se busca en Nominatim.
+  if (degraded) {
+    try {
+      const alternos = await nominatimPlaces(opts.category, location, geo.lat, geo.lon);
+      if (alternos.length) {
+        const conDatos = alternos.filter((b) => b.phone || b.website).length;
+        const result: SearchResult = {
+          businesses: alternos.slice(0, limit),
+          city: geo.label.split(",").slice(0, 2).join(","),
+          categoryLabel: label,
+          scanned: alternos.length,
+          degraded: false,
+        };
+        console.log(`[mapas] Overpass caído → Nominatim devolvió ${alternos.length} (${conDatos} con teléfono/web)`);
+        if (result.businesses.length) searchCache.set(cacheKey, { at: Date.now(), result });
+        return result;
+      }
+    } catch (e) {
+      console.error("[mapas] el plan B (Nominatim) también falló:", e instanceof Error ? e.message : e);
+    }
+  }
 
   const seen = new Set<string>();
   const businesses: RealBusiness[] = [];
