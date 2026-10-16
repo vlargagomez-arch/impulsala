@@ -41,45 +41,68 @@ async function getPostFromCRM(slug: string): Promise<BlogPost | null> {
     // Parsear contenido
     let content: any = article.content;
     if (typeof content === "string") {
-      // Si contiene "---" seguido de texto, separar el JSON del CTA
+      // Separar JSON del CTA
       const ctaSplit = content.split(/\n---\n/);
       const jsonPart = ctaSplit[0].trim();
       const ctaPart = ctaSplit.slice(1).join('\n---\n').trim();
       
+      // Intentar JSON.parse normal
+      let parsed = false;
       if (jsonPart.startsWith("[")) {
         try {
           content = JSON.parse(jsonPart);
-          // Si hay CTA, agregarlo como bloque
-          if (ctaPart) {
-            content.push({ type: "p", content: ctaPart });
-          }
+          parsed = true;
         } catch {
-          content = [{ type: "p", content: content }];
+          // JSON inválido (probablemente por HTML crudo dentro)
+          // Extraer bloques con regex
+          const blocks: any[] = [];
+          const blockPattern = /\{"type":"([^"]+)","([^"]+)":"([^}]*)\}/g;
+          let match;
+          while ((match = blockPattern.exec(jsonPart)) !== null) {
+            const type = match[1];
+            const field = match[2];
+            const value = match[3];
+            blocks.push({ type, [field]: value });
+          }
+          
+          // Si también hay bloques con "items" (listas), extraerlos
+          const ulPattern = /\{"type":"ul","items":\[([^\]]*)\]\}/g;
+          while ((match = ulPattern.exec(jsonPart)) !== null) {
+            const itemsStr = match[1];
+            const items = itemsStr.split('","').map(s => s.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
+            blocks.push({ type: "ul", items });
+          }
+          
+          content = blocks.length > 0 ? blocks : [{ type: "p", content: content }];
+          parsed = true;
         }
       } else if (jsonPart.startsWith("{")) {
         try {
           content = [JSON.parse(jsonPart)];
-          if (ctaPart) content.push({ type: "p", content: ctaPart });
+          parsed = true;
         } catch {
           content = [{ type: "p", content: content }];
+          parsed = true;
         }
-      } else {
-        // Texto plano: dividir por párrafos
-        const paragraphs = content.split(/\n\n+/).filter(p => p.trim());
+      }
+      
+      if (!parsed) {
+        // Texto plano
+        const paragraphs = content.split(/\n\n+/).filter((p: string) => p.trim());
         const blocks: any[] = [];
         for (const para of paragraphs) {
           const trimmed = para.trim();
-          if (trimmed.startsWith("### ")) {
-            blocks.push({ type: "h3", content: trimmed.replace(/^###\s+/, "") });
-          } else if (trimmed.startsWith("## ")) {
-            blocks.push({ type: "h2", content: trimmed.replace(/^##\s+/, "") });
-          } else if (trimmed.startsWith("---")) {
-            // Separador, ignorar
-          } else {
-            blocks.push({ type: "p", content: trimmed });
-          }
+          if (trimmed.startsWith("### ")) blocks.push({ type: "h3", content: trimmed.replace(/^###\s+/, "") });
+          else if (trimmed.startsWith("## ")) blocks.push({ type: "h2", content: trimmed.replace(/^##\s+/, "") });
+          else if (trimmed.startsWith("---")) continue;
+          else blocks.push({ type: "p", content: trimmed });
         }
         content = blocks.length > 0 ? blocks : [{ type: "p", content: content }];
+      }
+      
+      // Agregar CTA si existe
+      if (ctaPart && Array.isArray(content)) {
+        content.push({ type: "p", content: ctaPart });
       }
     }
 
