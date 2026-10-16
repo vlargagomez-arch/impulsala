@@ -41,38 +41,44 @@ async function getPostFromCRM(slug: string): Promise<BlogPost | null> {
     // Parsear contenido
     let content: any = article.content;
     if (typeof content === "string") {
-      // Si parece JSON, parsearlo
-      if (content.trim().startsWith("[") || content.trim().startsWith("{")) {
+      // Si contiene "---" seguido de texto, separar el JSON del CTA
+      const ctaSplit = content.split(/\n---\n/);
+      const jsonPart = ctaSplit[0].trim();
+      const ctaPart = ctaSplit.slice(1).join('\n---\n').trim();
+      
+      if (jsonPart.startsWith("[")) {
         try {
-          content = JSON.parse(content);
+          content = JSON.parse(jsonPart);
+          // Si hay CTA, agregarlo como bloque
+          if (ctaPart) {
+            content.push({ type: "p", content: ctaPart });
+          }
         } catch {
-          // Si no es JSON válido, convertir a bloques
+          content = [{ type: "p", content: content }];
+        }
+      } else if (jsonPart.startsWith("{")) {
+        try {
+          content = [JSON.parse(jsonPart)];
+          if (ctaPart) content.push({ type: "p", content: ctaPart });
+        } catch {
           content = [{ type: "p", content: content }];
         }
       } else {
-        // Es texto plano o HTML, convertir a bloques
-        // Dividir por párrafos (doble salto de línea)
+        // Texto plano: dividir por párrafos
         const paragraphs = content.split(/\n\n+/).filter(p => p.trim());
         const blocks: any[] = [];
-        
         for (const para of paragraphs) {
           const trimmed = para.trim();
-          
-          // Detectar si es un header markdown (## o ###)
           if (trimmed.startsWith("### ")) {
             blocks.push({ type: "h3", content: trimmed.replace(/^###\s+/, "") });
           } else if (trimmed.startsWith("## ")) {
             blocks.push({ type: "h2", content: trimmed.replace(/^##\s+/, "") });
           } else if (trimmed.startsWith("---")) {
             // Separador, ignorar
-          } else if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
-            // Texto en negrita completo
-            blocks.push({ type: "p", content: trimmed });
           } else {
             blocks.push({ type: "p", content: trimmed });
           }
         }
-        
         content = blocks.length > 0 ? blocks : [{ type: "p", content: content }];
       }
     }

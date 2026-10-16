@@ -22,12 +22,24 @@ async function getCrmPosts(): Promise<BlogPost[]> {
     return articles.map((a: any) => {
       let content = a.content;
       if (typeof content === "string") {
-        if (content.trim().startsWith("[") || content.trim().startsWith("{")) {
-          try { content = JSON.parse(content); } catch { content = [{ type: "p", content }]; }
+        const ctaSplit = content.split(/\n---\n/);
+        const jsonPart = ctaSplit[0].trim();
+        const ctaPart = ctaSplit.slice(1).join('\n---\n').trim();
+        
+        if (jsonPart.startsWith("[")) {
+          try {
+            content = JSON.parse(jsonPart);
+            if (ctaPart) content.push({ type: "p", content: ctaPart });
+          } catch { content = [{ type: "p", content }]; }
+        } else if (jsonPart.startsWith("{")) {
+          try {
+            content = [JSON.parse(jsonPart)];
+            if (ctaPart) content.push({ type: "p", content: ctaPart });
+          } catch { content = [{ type: "p", content }]; }
         } else {
           const paragraphs = content.split(/\n\n+/).filter((p: string) => p.trim());
           content = paragraphs.length > 0
-            ? paragraphs.map((p: string) => ({ type: "p", content: p.trim() }))
+            ? paragraphs.filter((p: string) => !p.trim().startsWith("---")).map((p: string) => ({ type: "p", content: p.trim() }))
             : [{ type: "p", content }];
         }
       }
