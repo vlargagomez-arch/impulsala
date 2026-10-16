@@ -184,7 +184,7 @@ export function BlogArticle({ post, relatedPosts }: { post: BlogPost; relatedPos
           {/* Hero image */}
           {post.image && (
             <div className="relative mt-6 aspect-video overflow-hidden rounded-2xl border border-border/40 bg-secondary/20">
-              <img src={post.image} alt={post.title} className="absolute inset-0 h-full w-full object-cover" loading="eager" />
+              <img src={`${post.image}?v=20261016`} alt={post.title} className="absolute inset-0 h-full w-full object-cover" loading="eager" />
             </div>
           )}
         </div>
