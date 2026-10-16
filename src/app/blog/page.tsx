@@ -22,7 +22,14 @@ async function getCrmPosts(): Promise<BlogPost[]> {
     return articles.map((a: any) => {
       let content = a.content;
       if (typeof content === "string") {
-        try { content = JSON.parse(content); } catch { content = [{ type: "p", content: content }]; }
+        if (content.trim().startsWith("[") || content.trim().startsWith("{")) {
+          try { content = JSON.parse(content); } catch { content = [{ type: "p", content }]; }
+        } else {
+          const paragraphs = content.split(/\n\n+/).filter((p: string) => p.trim());
+          content = paragraphs.length > 0
+            ? paragraphs.map((p: string) => ({ type: "p", content: p.trim() }))
+            : [{ type: "p", content }];
+        }
       }
 
       return {

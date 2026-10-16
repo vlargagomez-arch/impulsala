@@ -41,11 +41,39 @@ async function getPostFromCRM(slug: string): Promise<BlogPost | null> {
     // Parsear contenido
     let content: any = article.content;
     if (typeof content === "string") {
-      try {
-        content = JSON.parse(content);
-      } catch {
-        // Si no es JSON, convertir a bloques simples
-        content = [{ type: "p", content: content }];
+      // Si parece JSON, parsearlo
+      if (content.trim().startsWith("[") || content.trim().startsWith("{")) {
+        try {
+          content = JSON.parse(content);
+        } catch {
+          // Si no es JSON válido, convertir a bloques
+          content = [{ type: "p", content: content }];
+        }
+      } else {
+        // Es texto plano o HTML, convertir a bloques
+        // Dividir por párrafos (doble salto de línea)
+        const paragraphs = content.split(/\n\n+/).filter(p => p.trim());
+        const blocks: any[] = [];
+        
+        for (const para of paragraphs) {
+          const trimmed = para.trim();
+          
+          // Detectar si es un header markdown (## o ###)
+          if (trimmed.startsWith("### ")) {
+            blocks.push({ type: "h3", content: trimmed.replace(/^###\s+/, "") });
+          } else if (trimmed.startsWith("## ")) {
+            blocks.push({ type: "h2", content: trimmed.replace(/^##\s+/, "") });
+          } else if (trimmed.startsWith("---")) {
+            // Separador, ignorar
+          } else if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
+            // Texto en negrita completo
+            blocks.push({ type: "p", content: trimmed });
+          } else {
+            blocks.push({ type: "p", content: trimmed });
+          }
+        }
+        
+        content = blocks.length > 0 ? blocks : [{ type: "p", content: content }];
       }
     }
 

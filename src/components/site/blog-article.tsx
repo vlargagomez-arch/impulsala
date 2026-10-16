@@ -11,9 +11,14 @@ import {
 } from "lucide-react";
 import type { BlogPost, BlogCategory } from "@/components/site/blog-data";
 
-// Función para renderizar texto con links de WhatsApp y markdown
+// Función para renderizar texto con links de WhatsApp y HTML
 function renderTextWithLinks(text: string): React.ReactNode {
-  if (!text) return text;
+  if (!text) return null;
+  
+  // Si el texto contiene HTML (como <a href=...>), renderizarlo como HTML
+  if (text.includes("<a ") || text.includes("<strong>") || text.includes("<b>")) {
+    return <span dangerouslySetInnerHTML={{ __html: text }} />;
+  }
   
   // Buscar patrones de links markdown: [texto](url)
   const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
@@ -23,15 +28,12 @@ function renderTextWithLinks(text: string): React.ReactNode {
   let key = 0;
   
   while ((match = linkPattern.exec(text)) !== null) {
-    // Texto antes del link
     if (match.index > lastIndex) {
       parts.push(text.slice(lastIndex, match.index));
     }
     
     const linkText = match[1];
     const linkUrl = match[2];
-    
-    // Verificar si es un link de WhatsApp
     const isWhatsApp = linkUrl.includes("wa.me") || linkUrl.includes("whatsapp");
     
     parts.push(
@@ -52,7 +54,6 @@ function renderTextWithLinks(text: string): React.ReactNode {
     lastIndex = match.index + match[0].length;
   }
   
-  // Texto después del último link
   if (lastIndex < text.length) {
     parts.push(text.slice(lastIndex));
   }
