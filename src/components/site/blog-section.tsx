@@ -38,19 +38,11 @@ export function BlogSection() {
         if (data.articles && data.articles.length > 0) {
           // Convertir artículos del CRM al formato BlogPost
           const converted: BlogPost[] = data.articles.map((a: any) => {
-            // Si no tiene imagen, asignar una por defecto según la categoría
-            let image = a.imageUrl || "/blog/default.webp";
+            // Si no tiene imagen, usar la imagen específica del CRM por slug
+            let image = a.imageUrl || `/blog/crm/${a.slug}.webp`;
+            // Fallback a default si la imagen del CRM no existe
             if (!a.imageUrl) {
-              const cat = a.category || "Marketing Digital";
-              if (cat.includes("SEO")) image = "/blog/seo-con-ia.webp";
-              else if (cat.includes("Ads") || cat.includes("Publicidad")) image = "/blog/google-ads-ia.webp";
-              else if (cat.includes("IA") || cat.includes("Automatización")) image = "/blog/agentes-ia-venden.webp";
-              else if (cat.includes("Web") || cat.includes("Desarrollo")) image = "/blog/pagina-web-vende.webp";
-              else if (cat.includes("Email")) image = "/blog/email-marketing-ia.webp";
-              else if (cat.includes("WhatsApp")) image = "/blog/whatsapp-business-ia.webp";
-              else if (cat.includes("CRM")) image = "/blog/crm-piensa-por-ti.webp";
-              else if (cat.includes("E-commerce") || cat.includes("Tienda")) image = "/blog/ecommerce-autonomo.webp";
-              else image = "/blog/default.webp";
+              image = `/blog/crm/${a.slug}.webp`;
             }
             return {
             slug: a.slug,

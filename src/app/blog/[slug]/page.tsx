@@ -35,20 +35,8 @@ async function getPostFromCRM(slug: string): Promise<BlogPost | null> {
 
     if (!article || !article.published) return null;
 
-    // Asignar imagen por defecto según categoría si no tiene
-    let image = article.imageUrl || "/blog/default.webp";
-    if (!article.imageUrl) {
-      const cat = article.category || "Marketing Digital";
-      if (cat.includes("SEO")) image = "/blog/seo-con-ia.webp";
-      else if (cat.includes("Ads") || cat.includes("Publicidad")) image = "/blog/google-ads-ia.webp";
-      else if (cat.includes("IA") || cat.includes("Automatización")) image = "/blog/agentes-ia-venden.webp";
-      else if (cat.includes("Web") || cat.includes("Desarrollo")) image = "/blog/pagina-web-vende.webp";
-      else if (cat.includes("Email")) image = "/blog/email-marketing-ia.webp";
-      else if (cat.includes("WhatsApp")) image = "/blog/whatsapp-business-ia.webp";
-      else if (cat.includes("CRM")) image = "/blog/crm-piensa-por-ti.webp";
-      else if (cat.includes("E-commerce") || cat.includes("Tienda")) image = "/blog/ecommerce-autonomo.webp";
-      else image = "/blog/default.webp";
-    }
+    // Asignar imagen específica del CRM por slug
+    let image = article.imageUrl || `/blog/crm/${article.slug}.webp`;
 
     // Parsear contenido
     let content: any = article.content;
