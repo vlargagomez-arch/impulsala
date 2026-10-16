@@ -26,24 +26,20 @@ const CATEGORY_STYLES: Record<BlogCategory, { dot: string; badge: string; gradie
   "Casos de Éxito": { dot: "bg-violet-500", badge: "text-violet-600 dark:text-violet-400 bg-violet-500/10 border-violet-500/20", gradient: "from-violet-500/40 via-indigo-500/20 to-transparent" },
 };
 
-export function BlogSection() {
+export function BlogSection({ crmPosts: initialCrmPosts }: { crmPosts?: BlogPost[] }) {
   const [activeCategory, setActiveCategory] = useState<BlogCategory | "Todos">("Todos");
-  const [crmPosts, setCrmPosts] = useState<BlogPost[]>([]);
+  const [crmPosts, setCrmPosts] = useState<BlogPost[]>(initialCrmPosts || []);
 
-  // Cargar artículos del CRM
+  // Si no recibió los posts como prop, cargar con fetch (fallback)
   useEffect(() => {
+    if (initialCrmPosts && initialCrmPosts.length > 0) return;
+    
     fetch("/api/blog/posts")
       .then((r) => r.json())
       .then((data) => {
         if (data.articles && data.articles.length > 0) {
-          // Convertir artículos del CRM al formato BlogPost
           const converted: BlogPost[] = data.articles.map((a: any) => {
-            // Si no tiene imagen, usar la imagen específica del CRM por slug
             let image = a.imageUrl || `/blog/crm/${a.slug}.webp`;
-            // Fallback a default si la imagen del CRM no existe
-            if (!a.imageUrl) {
-              image = `/blog/crm/${a.slug}.webp`;
-            }
             return {
             slug: a.slug,
             title: a.title,
@@ -62,7 +58,7 @@ export function BlogSection() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [initialCrmPosts]);
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [showAllTags, setShowAllTags] = useState(false);
