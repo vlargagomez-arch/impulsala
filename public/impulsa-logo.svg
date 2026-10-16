@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradiente de la web: índigo → fucsia → rosa -->
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#d946ef"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Llave izquierda { -->
+  <path d="M 42 20
+           Q 30 20 30 32
+           L 30 44
+           Q 30 52 22 52
+           Q 30 52 30 60
+           L 30 72
+           Q 30 84 42 84"
+        fill="none"
+        stroke="url(#brandGradient)"
+        stroke-width="7"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Punto de la i -->
+  <circle cx="60" cy="32" r="7" fill="url(#brandGradient)"/>
+
+  <!-- Cuerpo de la i (barra vertical) -->
+  <rect x="55" y="46" width="10" height="38" rx="5" fill="url(#brandGradient)"/>
+
+  <!-- Llave derecha } -->
+  <path d="M 78 20
+           Q 90 20 90 32
+           L 90 44
+           Q 90 52 98 52
+           Q 90 52 90 60
+           L 90 72
+           Q 90 84 78 84"
+        fill="none"
+        stroke="url(#brandGradient)"
+        stroke-width="7"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,9 @@
+skills/
+node_modules/
+worklog.md
+.env
+.env.example
+.next/
+tool-results/
+deploy-kit/
+scripts/package-source.sh
