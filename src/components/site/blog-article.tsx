@@ -262,16 +262,27 @@ export function BlogArticle({ post, relatedPosts }: { post: BlogPost; relatedPos
         <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-5 text-center">
           <p className="text-sm font-semibold text-foreground">¿Quieres implementar esto en tu negocio?</p>
           <p className="mt-1 text-xs text-muted-foreground">Cuéntanos sobre tu proyecto y te damos una asesoría personalizada.</p>
-          <button
-            type="button"
-            onClick={() => openAiChat({ diagnostic: true })}
-            className="mt-3 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110 active:scale-95"
-          >
-            Solicitar diagnóstico gratis
-            <ArrowRight className="h-4 w-4" />
-          </button>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => openAiChat({ diagnostic: true })}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:brightness-110 active:scale-95"
+            >
+              Solicitar diagnóstico gratis
+              <ArrowRight className="h-4 w-4" />
+            </button>
+            <a
+              href="https://wa.me/573196354992?text=Hola,%20quiero%20agendar%20mi%20diagn%C3%B3stico%20gratis%20con%20Impulsala"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all hover:shadow-emerald-500/40 hover:brightness-110 active:scale-95"
+            >
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp directo
+            </a>
+          </div>
           <p className="mt-2 text-[11px] text-muted-foreground">
-            💬 Habla con nuestro asistente IA — resuelve tus dudas y agenda cuando quieras
+            💬 Escríbenos por WhatsApp y agenda tu diagnóstico gratis ahora mismo
           </p>
         </div>
 
