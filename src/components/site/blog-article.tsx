@@ -11,6 +11,55 @@ import {
 } from "lucide-react";
 import type { BlogPost, BlogCategory } from "@/components/site/blog-data";
 
+// Función para renderizar texto con links de WhatsApp y markdown
+function renderTextWithLinks(text: string): React.ReactNode {
+  if (!text) return text;
+  
+  // Buscar patrones de links markdown: [texto](url)
+  const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+  let key = 0;
+  
+  while ((match = linkPattern.exec(text)) !== null) {
+    // Texto antes del link
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    
+    const linkText = match[1];
+    const linkUrl = match[2];
+    
+    // Verificar si es un link de WhatsApp
+    const isWhatsApp = linkUrl.includes("wa.me") || linkUrl.includes("whatsapp");
+    
+    parts.push(
+      <a
+        key={key++}
+        href={linkUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={isWhatsApp 
+          ? "text-emerald-500 dark:text-emerald-400 font-semibold underline hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors"
+          : "text-primary font-medium underline hover:text-primary/80 transition-colors"
+        }
+      >
+        {linkText}
+      </a>
+    );
+    
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Texto después del último link
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  
+  return parts.length > 0 ? parts : text;
+}
+
 const CATEGORY_STYLES: Record<BlogCategory, { dot: string; badge: string }> = {
   "Desarrollo Web": { dot: "bg-sky-500", badge: "text-sky-600 dark:text-sky-400 bg-sky-500/10 border-sky-500/20" },
   "SEO": { dot: "bg-cyan-500", badge: "text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
@@ -151,7 +200,7 @@ export function BlogArticle({ post, relatedPosts }: { post: BlogPost; relatedPos
               return <h3 key={i} className="mt-6 mb-2 text-lg font-bold text-foreground sm:text-xl">{block.content}</h3>;
             }
             if (block.type === "p") {
-              return <p key={i} className="mb-4 text-sm leading-relaxed text-foreground/80 sm:text-base">{block.content}</p>;
+              return <p key={i} className="mb-4 text-sm leading-relaxed text-foreground/80 sm:text-base">{renderTextWithLinks(block.content || "")}</p>;
             }
             if (block.type === "quote") {
               return (
