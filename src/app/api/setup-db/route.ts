@@ -10,6 +10,15 @@ import { db } from "@/lib/db";
  */
 
 export async function GET(req: NextRequest) {
+  // Protegido: inserta datos demo. Sin secreto válido -> 401.
+  const secret = process.env.CRON_SECRET;
+  const provided =
+    req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ||
+    req.nextUrl.searchParams.get("secret") ||
+    "";
+  if (!secret || provided !== secret) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   try {
     const results: string[] = [];
 
