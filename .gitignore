@@ -1,10 +1,40 @@
 skills/
 node_modules/
 worklog.md
-.env
-.env.example
-.next/
 tool-results/
 deploy-kit/
 scripts/package-source.sh
 .github/
+
+# Secretos y tokens locales (NUNCA subir)
+.vtok
+.dburl
+.dburl2.tmp
+.cronsecret
+.cronsecret.tmp
+.hostinger-token
+.env
+.env.local
+.env*.local
+scripts/find-supabase-host.cjs
+.google-oauth.json
+.google-token.json
+.google-token*.json
+.gsc-listen.log
+
+# Salidas de build y despliegue
+.next/
+.vercel/
+out/
+build/
+dist/
+tsconfig.tsbuildinfo
+
+# Basura de agentes/pruebas
+dev.log
+server.log
+db/
+.zscripts/
+screenshot-*.png
+*.analysis.json
+.hermes/

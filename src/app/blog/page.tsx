@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site-config";
 import { Navbar } from "@/components/site/navbar";
 import { ScrollProgress } from "@/components/site/top-progress-bar";
 import { StickyCTA } from "@/components/site/sticky-cta";
@@ -8,6 +9,7 @@ import { BLOG_POSTS, type BlogPost } from "@/components/site/blog-data";
 import { db } from "@/lib/db";
 
 export const metadata = {
+  alternates: { canonical: `${SITE_URL}/blog` },
   title: "Blog — Impulsala | Marketing digital, IA, SEO y tecnología",
   description: "Análisis, tendencias y casos de estudio sobre IA, SEO, Ads, automatización y las tecnologías que están redefiniendo el marketing digital.",
 };

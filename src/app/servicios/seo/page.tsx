@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site-config";
 import type { Metadata } from "next";
 import { ServicePage, type ServicePageData } from "@/components/site/service-page";
 
@@ -6,13 +7,13 @@ export const metadata: Metadata = {
   description:
     "Posiciona tu web en los primeros resultados de Google. Auditoría SEO gratis. Estrategias comprobadas para PYMES en Colombia. Resultados en 3-6 meses.",
   alternates: {
-    canonical: "https://w14nq5fjb3z1-d.space-z.ai/servicios/seo",
+    canonical: `${SITE_URL}/servicios/seo`,
   },
   openGraph: {
     title: "SEO y Posicionamiento en Google | Impulsala Bogotá",
     description:
       "Posiciona tu web en los primeros resultados de Google. Auditoría SEO gratis. Estrategias comprobadas para PYMES en Colombia.",
-    url: "https://w14nq5fjb3z1-d.space-z.ai/servicios/seo",
+    url: `${SITE_URL}/servicios/seo`,
     type: "website",
   },
 };

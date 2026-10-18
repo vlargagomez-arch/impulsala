@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site-config";
 import type { Metadata } from "next";
 import { ServicePage, type ServicePageData } from "@/components/site/service-page";
 
@@ -6,13 +7,13 @@ export const metadata: Metadata = {
   description:
     "Implementamos agentes de IA, chatbots inteligentes y automatizaciones que trabajan 24/7. Demo en vivo 5 minutos. Inteligencia artificial aplicada a PYMES en Colombia.",
   alternates: {
-    canonical: "https://w14nq5fjb3z1-d.space-z.ai/servicios/automatizacion-ia",
+    canonical: `${SITE_URL}/servicios/automatizacion-ia`,
   },
   openGraph: {
     title: "Automatización con Inteligencia Artificial | Impulsala Colombia",
     description:
       "Implementamos agentes de IA, chatbots inteligentes y automatizaciones que trabajan 24/7. Inteligencia artificial aplicada a PYMES en Colombia.",
-    url: "https://w14nq5fjb3z1-d.space-z.ai/servicios/automatizacion-ia",
+    url: `${SITE_URL}/servicios/automatizacion-ia`,
     type: "website",
   },
 };

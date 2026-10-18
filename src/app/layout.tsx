@@ -25,13 +25,14 @@ function getSiteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
     return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
   }
-  return "https://impulsala.vercel.app";
+  return "https://impulsala.com";
 }
 
 const SITE_URL = getSiteUrl();
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Impulsala | Desarrollo Web, SEO y Automatización con IA | Diagnóstico Gratis",
   description:
     "Rediseñamos tu sitio web, lo posicionamos en Google y automatizamos ventas con IA. Resultados medibles en 30 días o devolución. Agenda diagnóstico gratis en Bogotá, Colombia.",

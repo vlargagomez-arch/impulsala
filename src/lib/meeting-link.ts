@@ -14,7 +14,7 @@
  */
 
 const GOOGLE_MEET_LINK = process.env.GOOGLE_MEET_LINK || "";
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://impulsala.co";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://impulsala.com";
 
 export interface MeetingLink {
   url: string;

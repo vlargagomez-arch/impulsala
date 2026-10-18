@@ -19,7 +19,7 @@ const FALLBACK_REDIRECT_URI =
 function detectRedirectUri(request?: Request): string {
   // 1. PRIORIDAD: Si NEXT_PUBLIC_SITE_URL está configurado, usarlo SIEMPRE
   // Esto evita problemas con hosts internos de Alibaba FC
-  const publicSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://d1m686vag521-d.space-z.ai";
+  const publicSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://impulsala.com";
   return `${publicSiteUrl.replace(/\/$/, "")}/api/google-calendar/callback`;
 }
 

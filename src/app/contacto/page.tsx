@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site-config";
 import dynamic from "next/dynamic";
 import { Navbar } from "@/components/site/navbar";
 import { ScrollProgress } from "@/components/site/top-progress-bar";
@@ -8,6 +9,7 @@ import { Footer } from "@/components/site/footer";
 const ContactoPage = dynamic(() => import("@/components/site/contacto-page").then((m) => m.ContactoPage));
 
 export const metadata = {
+  alternates: { canonical: `${SITE_URL}/contacto` },
   title: "Contacto — Impulsala | Agenda tu diagnóstico gratuito",
   description: "Agenda una sesión de 30 minutos con nuestro equipo. Diagnóstico gratuito, respuesta en menos de 2 horas, sin compromiso.",
 };

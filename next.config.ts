@@ -40,6 +40,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // /logos es una página interna de selección de marca: fuera del índice
+        source: "/logos",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      {
         source: "/(.*)",
         headers: [
           { key: "X-Frame-Options", value: "SAMEORIGIN" },

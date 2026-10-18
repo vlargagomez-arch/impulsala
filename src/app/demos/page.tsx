@@ -8,7 +8,7 @@ import { Footer } from "@/components/site/footer";
 
 const Demos = dynamic(() => import("@/components/site/demos").then((m) => m.default));
 
-const SITE_URL = "https://w14nq5fjb3z1-d.space-z.ai";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Demos Interactivas | Impulsala",

@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site-config";
 import type { Metadata } from "next";
 import { ServicePage, type ServicePageData } from "@/components/site/service-page";
 
@@ -6,13 +7,13 @@ export const metadata: Metadata = {
   description:
     "Marketing digital que genera leads, no solo likes. Google Ads, Meta Ads, TikTok Ads y YouTube Ads. ROI promedio 340%. Desde $1.5M COP/mes para PYMES en Colombia.",
   alternates: {
-    canonical: "https://w14nq5fjb3z1-d.space-z.ai/servicios/publicidad-digital",
+    canonical: `${SITE_URL}/servicios/publicidad-digital`,
   },
   openGraph: {
     title: "Campañas Publicitarias (Google Ads, Meta Ads) | Impulsala Colombia",
     description:
       "Marketing digital que genera leads, no solo likes. Google Ads, Meta Ads, TikTok Ads y YouTube Ads. ROI promedio 340%.",
-    url: "https://w14nq5fjb3z1-d.space-z.ai/servicios/publicidad-digital",
+    url: `${SITE_URL}/servicios/publicidad-digital`,
     type: "website",
   },
 };

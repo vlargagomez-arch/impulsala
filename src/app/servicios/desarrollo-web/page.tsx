@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site-config";
 import type { Metadata } from "next";
 import { ServicePage, type ServicePageData } from "@/components/site/service-page";
 
@@ -6,13 +7,13 @@ export const metadata: Metadata = {
   description:
     "Desarrollo web a medida para PYMES en Colombia: e-commerce, CRM, aplicaciones web y sistemas internos. Presupuesto en 24 horas. Resultados garantizados.",
   alternates: {
-    canonical: "https://w14nq5fjb3z1-d.space-z.ai/servicios/desarrollo-web",
+    canonical: `${SITE_URL}/servicios/desarrollo-web`,
   },
   openGraph: {
     title: "Desarrollo Web Profesional en Bogotá | Impulsala",
     description:
       "Desarrollo web a medida para PYMES en Colombia: e-commerce, CRM, aplicaciones web y sistemas internos.",
-    url: "https://w14nq5fjb3z1-d.space-z.ai/servicios/desarrollo-web",
+    url: `${SITE_URL}/servicios/desarrollo-web`,
     type: "website",
   },
 };

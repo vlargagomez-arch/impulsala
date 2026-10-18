@@ -3,7 +3,7 @@ import { BLOG_POSTS } from "@/components/site/blog-data";
 
 // URL canónica del sitio — cuando compres el dominio, cambiá esto
 // Por ahora usa la URL de Vercel
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://impulsala.vercel.app";
+import { SITE_URL as BASE_URL } from "@/lib/site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -19,7 +19,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE_URL}/demos`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE_URL}/contacto`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${BASE_URL}/logos`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
   ];
 
   const blogPosts: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({

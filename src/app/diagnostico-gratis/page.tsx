@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site-config";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/site/navbar";
@@ -15,13 +16,13 @@ export const metadata: Metadata = {
   description:
     "Agenda tu diagnóstico gratuito de 30 minutos. Análisis de tu negocio, oportunidades de crecimiento y plan de acción. Sin costo, sin compromiso. Bogotá, Colombia.",
   alternates: {
-    canonical: "https://w14nq5fjb3z1-d.space-z.ai/diagnostico-gratis",
+    canonical: `${SITE_URL}/diagnostico-gratis`,
   },
   openGraph: {
     title: "Diagnóstico Gratuito | Impulsala",
     description:
       "Agenda tu diagnóstico gratuito de 30 minutos. Sin costo, sin compromiso. Bogotá, Colombia.",
-    url: "https://w14nq5fjb3z1-d.space-z.ai/diagnostico-gratis",
+    url: `${SITE_URL}/diagnostico-gratis`,
     type: "website",
   },
 };

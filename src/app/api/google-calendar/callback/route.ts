@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   const PUBLIC_URL =
     process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://d1m686vag521-d.space-z.ai";
+    "https://impulsala.com";
 
   // Si hay error, redirigir al CRM con error
   if (error) {

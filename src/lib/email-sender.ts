@@ -29,7 +29,7 @@ import nodemailer from "nodemailer";
 const EMAIL_USER = process.env.EMAIL_USER || "vlargagomez@gmail.com";
 const EMAIL_PASS = process.env.EMAIL_PASS || "[EMAIL-PASS-EN-ENV]";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://d1m686vag521-d.space-z.ai";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://impulsala.com";
 
 type Provider = "gmail" | "ethereal";
 

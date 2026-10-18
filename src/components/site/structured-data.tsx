@@ -1,4 +1,4 @@
-const SITE_URL = "https://w14nq5fjb3z1-d.space-z.ai";
+import { SITE_URL } from "@/lib/site-config";
 
 /**
  * StructuredData — Schema.org JSON-LD scripts.

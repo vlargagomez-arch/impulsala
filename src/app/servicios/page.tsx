@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site-config";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/site/navbar";
@@ -13,13 +14,13 @@ export const metadata: Metadata = {
   description:
     "Agencia digital en Bogotá, Colombia. Desarrollo web, SEO orgánico, campañas publicitarias y automatización con IA. Especialistas en PYMES. Diagnóstico gratis.",
   alternates: {
-    canonical: "https://w14nq5fjb3z1-d.space-z.ai/servicios",
+    canonical: `${SITE_URL}/servicios`,
   },
   openGraph: {
     title: "Servicios de Desarrollo Web, SEO, Marketing Digital e IA | Impulsala Bogotá",
     description:
       "Agencia digital en Bogotá, Colombia. Desarrollo web, SEO, marketing digital y automatización con IA para PYMES.",
-    url: "https://w14nq5fjb3z1-d.space-z.ai/servicios",
+    url: `${SITE_URL}/servicios`,
     type: "website",
   },
 };
