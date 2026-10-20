@@ -387,7 +387,7 @@ function FeaturedCard({ post }: { post: BlogPost }) {
     <Link href={`/blog/${post.slug}`} className="group block overflow-hidden rounded-2xl border border-border/60 bg-card/40 transition-all hover:border-primary/40 hover:shadow-xl">
       <div className="grid grid-cols-1 lg:grid-cols-2">
         <div className="relative h-56 overflow-hidden sm:h-64 lg:h-auto">
-          {post.image && <img src={`${post.image}?v=20261017`} alt={post.title} loading="lazy" width="400" height="200" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+          {post.image && <img src={`${post.image}?v=20261018`} alt={post.title} loading="lazy" width="400" height="200" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
           <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
           <span className="absolute left-3 top-3 rounded-full bg-primary px-2 py-0.5 text-[9px] font-bold text-primary-foreground">DESTACADO</span>
         </div>
@@ -420,7 +420,7 @@ function ArticleCard({ post, index }: { post: BlogPost; index: number }) {
     <motion.div initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ delay: (index % 6) * 0.05 }}>
       <Link href={`/blog/${post.slug}`} className="group flex h-full flex-col overflow-hidden rounded-xl border border-border/60 bg-card/40 transition-all hover:border-primary/40 hover:shadow-lg">
         <div className="relative h-36 overflow-hidden">
-          {post.image && <img src={`${post.image}?v=20261017`} alt={post.title} loading="lazy" width="400" height="200" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+          {post.image && <img src={`${post.image}?v=20261018`} alt={post.title} loading="lazy" width="400" height="200" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
           <div className="absolute inset-0 bg-gradient-to-t from-card/50 to-transparent" />
           <span className={`absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[8px] font-medium ${style.badge} backdrop-blur-sm`}>
             <span className={`h-1 w-1 rounded-full ${style.dot}`} /> {post.category}
