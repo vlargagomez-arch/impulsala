@@ -47,3 +47,6 @@ Verificación local válida: `npx prisma generate && npx next build` (exit 0) + 
 3. Después de cualquier cambio: `node scripts/ops.cjs deploy` y luego `node scripts/ops.cjs status` (verificar, no asumir).
 4. Respuestas cortas, datos reales, sin relleno.
 5. Para escalar a VPS/hosting propio: `deploy/VPS.md` (runbook) + `deploy/docker-compose.yml`.
+
+## Prospección de clientes
+`node scripts/prospect.cjs --nicho restaurante --ciudad bogota --limite 20 --propuestas 5` busca negocios con falencia digital (sin web, web caída, solo redes, lenta, sin móvil), los puntúa, y redacta propuesta con DeepSeek. Fuente: Google Places API (env `GOOGLE_PLACES_API_KEY`) o OpenStreetMap si no hay key. Salida en `prospectos/`. Pruebas: `--auditar <urls>` (mide falencia) y `--demo` (formato de propuesta).
