@@ -38,3 +38,6 @@ db/
 screenshot-*.png
 *.analysis.json
 .hermes/
+
+# datos de prospectos (clientes, no versionar)
+prospectos/

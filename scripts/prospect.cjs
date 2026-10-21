@@ -121,6 +121,65 @@ async function buscarPlaces() {
   return out.filter(p => { const k = p.nombre.toLowerCase() + p.telefono.slice(-7); if (seen.has(k)) return false; seen.add(k); return true; });
 }
 
+// ---------- Google Maps sin API key (gosom/google-maps-scraper) ----------
+const GMAPS_BIN = process.env.GMAPS_BIN || 'C:/Users/themo/tools/gmaps.exe';
+
+function parseCSV(txt) {
+  const rows = []; let row = [], cur = '', q = false;
+  for (let i = 0; i < txt.length; i++) {
+    const c = txt[i];
+    if (q) {
+      if (c === '"' && txt[i + 1] === '"') { cur += '"'; i++; }
+      else if (c === '"') q = false;
+      else cur += c;
+    } else if (c === '"') q = true;
+    else if (c === ',') { row.push(cur); cur = ''; }
+    else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+    else if (c !== '\r') cur += c;
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+
+function leerGmaps(csvPath) {
+  const rows = parseCSV(fs.readFileSync(csvPath, 'utf8'));
+  const head = rows.shift();
+  const idx = (n) => head.indexOf(n);
+  const out = [];
+  for (const r of rows) {
+    if (!r.length || !r[idx('title')]) continue;
+    out.push({
+      nombre: r[idx('title')],
+      nicho: NICHO, ciudad: C.nombre,
+      telefono: (r[idx('phone')] || '').split(';')[0].trim(),
+      web: (r[idx('website')] || '').split(';')[0].trim(),
+      email: (r[idx('emails')] || '').split(';')[0].trim(),
+      direccion: r[idx('address')] || r[idx('complete_address')] || '',
+      rating: parseFloat(r[idx('review_rating')]) || null,
+      resenas: parseInt(r[idx('review_count')] || '0', 10) || 0,
+      categoria: r[idx('category')] || '',
+      maps: (r[idx('link')] || '').split('?')[0],
+      fuente: 'google-maps',
+    });
+  }
+  return out;
+}
+
+function scrapeGmaps(query) {
+  const dir = path.join(process.cwd(), 'prospectos');
+  fs.mkdirSync(dir, { recursive: true });
+  const qFile = path.join(dir, '.queries.txt');
+  const outCsv = path.join(dir, `.gmaps-${CIUDAD}-${Date.now()}.csv`);
+  fs.writeFileSync(qFile, query + '\n');
+  if (!fs.existsSync(GMAPS_BIN)) throw new Error(`falta el binario: ${GMAPS_BIN} (descarga el release windows-amd64 de gosom/google-maps-scraper)`);
+  console.log(`   Google Maps (sin API key): "${query}" …`);
+  require('child_process').execFileSync(GMAPS_BIN, [
+    '-input', qFile, '-results', outCsv, '-lang', 'es',
+    '-depth', String(args.depth || 6), '-c', '1', '-exit-on-inactivity', '40s',
+  ], { stdio: ['ignore', 'ignore', 'ignore'], timeout: 600000 });
+  return leerGmaps(outCsv);
+}
+
 async function buscarOSM() {
   const all = new Map();
   for (const tag of filtros) {
@@ -258,13 +317,24 @@ No inventes precios, no inventes cifras de clientes ni resultados.`;
   }
 
   console.log(`\n🔎 Impulsala Prospect · ${NICHO} en ${C.nombre}`);
-  let crudos = await buscarPlaces();
-  if (crudos.length) console.log(`   Google Places: ${crudos.length} negocios`);
-  else {
-    console.log('   (sin GOOGLE_PLACES_API_KEY: usando OpenStreetMap, fuente lenta/inestable)');
-    crudos = await buscarOSM();
-    console.log(`   OSM: ${crudos.length} negocios con teléfono`);
+  let crudos = [];
+  if (args.csv) {
+    crudos = leerGmaps(args.csv);
+    console.log(`   CSV Google Maps: ${crudos.length} negocios`);
+  } else if (args.gmaps || args.googlemaps) {
+    crudos = scrapeGmaps(args.query || `${NICHO} en ${C.nombre}, Colombia`);
+    console.log(`   Google Maps: ${crudos.length} negocios`);
+  } else {
+    crudos = await buscarPlaces();
+    if (crudos.length) console.log(`   Google Places API: ${crudos.length} negocios`);
+    else {
+      console.log('   (sin GOOGLE_PLACES_API_KEY ni --gmaps: usando OpenStreetMap, hoy inestable)');
+      crudos = await buscarOSM();
+      console.log(`   OSM: ${crudos.length} negocios con teléfono`);
+    }
   }
+  crudos = crudos.filter(p => p.telefono || p.email);
+  console.log(`   contactables: ${crudos.length}`);
 
   const revisados = [];
   for (let i = 0; i < crudos.length; i += 8) {
